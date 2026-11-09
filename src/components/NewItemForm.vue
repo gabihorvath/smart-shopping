@@ -5,18 +5,21 @@ import type { CatalogItem } from '../domain/types'
 import { MSG, useAppStore } from '../stores/app'
 
 /** Inline form: create a catalog item (optionally with a new unit / aisle). */
-const props = defineProps<{ initialName: string }>()
-const emit = defineEmits<{ created: [item: CatalogItem]; cancel: [] }>()
+const props = defineProps<{ initialName: string; item?: CatalogItem; cancelLabel?: string }>()
+const emit = defineEmits<{ created: [item: CatalogItem]; cancel: []; delete: [] }>()
 
 const store = useAppStore()
 const NEW = '__new__'
 
 const name = ref(props.initialName.trim())
 const unitId = ref<string>(
-  store.units.find((u) => u.name === 'Stk')?.id ?? store.units[0]?.id ?? NEW,
+  props.item?.unitId ?? store.units.find((u) => u.name === 'Stk')?.id ?? store.units[0]?.id ?? NEW,
 )
 const aisleId = ref<string>(
-  store.activeShop?.aisleIds.find((id) => store.aisleById.has(id)) ?? store.aisles[0]?.id ?? NEW,
+  props.item?.aisleId ??
+    store.activeShop?.aisleIds.find((id) => store.aisleById.has(id)) ??
+    store.aisles[0]?.id ??
+    NEW,
 )
 const newUnitName = ref('')
 const newUnitStep = ref('1')
@@ -52,7 +55,13 @@ async function submit() {
       }
       aisleId.value = r.aisle.id
     }
-    const r = await store.createItem(name.value, unitId.value, aisleId.value)
+    const r = props.item
+      ? await store.updateItem(props.item.id, {
+          name: name.value,
+          unitId: unitId.value,
+          aisleId: aisleId.value,
+        })
+      : await store.createItem(name.value, unitId.value, aisleId.value)
     if (!r.ok) {
       errors.value = { name: r.error }
       return
@@ -131,14 +140,23 @@ const bad = 'border-red-500'
         class="min-h-12 rounded-xl px-4 font-medium text-gray-700 active:bg-gray-100"
         @click="emit('cancel')"
       >
-        Zurück
+        {{ cancelLabel ?? 'Zurück' }}
+      </button>
+      <button
+        v-if="item"
+        type="button"
+        data-testid="item-delete"
+        class="min-h-12 rounded-xl px-4 font-medium text-red-700 active:bg-gray-100"
+        @click="emit('delete')"
+      >
+        Löschen
       </button>
       <button
         type="submit"
         :disabled="busy"
         class="min-h-12 flex-1 rounded-xl bg-green-600 font-semibold text-white active:bg-green-700 disabled:bg-gray-300"
       >
-        Anlegen
+        {{ item ? 'Speichern' : 'Anlegen' }}
       </button>
     </div>
   </form>
