@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAppStore } from '../stores/app'
+import NewShopInline from './NewShopInline.vue'
 import BottomSheet from './ui/BottomSheet.vue'
 
 defineProps<{ modelValue: boolean }>()
@@ -14,6 +15,11 @@ async function choose(id: string) {
   if (r.ok) emit('update:modelValue', false)
   else error.value = r.error
 }
+
+function edit(id: string) {
+  emit('update:modelValue', false)
+  store.editShop(id)
+}
 </script>
 
 <template>
@@ -23,12 +29,12 @@ async function choose(id: string) {
     @update:model-value="emit('update:modelValue', $event)"
   >
     <ul role="radiogroup" aria-label="Laden" class="py-1">
-      <li v-for="s in store.shops" :key="s.id">
+      <li v-for="s in store.shops" :key="s.id" class="flex items-center">
         <button
           type="button"
           role="radio"
           :aria-checked="s.id === store.activeShopId"
-          class="flex min-h-12 w-full items-center gap-3 rounded-lg px-2 text-left active:bg-gray-100"
+          class="flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-lg px-2 text-left active:bg-gray-100"
           @click="choose(s.id)"
         >
           <span
@@ -39,8 +45,17 @@ async function choose(id: string) {
           </span>
           <span class="truncate text-base text-gray-900">{{ s.name }}</span>
         </button>
+        <button
+          type="button"
+          class="flex size-11 shrink-0 items-center justify-center rounded-lg text-lg text-gray-600 active:bg-gray-100"
+          :aria-label="`${s.name} bearbeiten`"
+          @click="edit(s.id)"
+        >
+          ✎
+        </button>
       </li>
     </ul>
+    <NewShopInline @created="edit($event.id)" />
     <p v-if="error" class="text-sm text-red-600" role="alert">{{ error }}</p>
   </BottomSheet>
 </template>
