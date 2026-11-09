@@ -149,7 +149,7 @@ test('invalid unit step is marked and blocks saving', async ({ page }) => {
   await page.getByTestId('fab').click()
   await page.getByTestId('unit-name').fill('Becher')
   await page.getByTestId('unit-step-input').fill('abc')
-  await expect(page.getByTestId('unit-step-input')).toHaveClass(/border-red-500/)
+  await expect(page.getByTestId('unit-step-input')).toHaveClass(/border-red-600/)
   await expect(dialog(page).getByRole('button', { name: 'Anlegen' })).toBeDisabled()
   await page.getByTestId('unit-step-input').fill('0')
   await expect(dialog(page).getByRole('button', { name: 'Anlegen' })).toBeDisabled()
@@ -213,6 +213,8 @@ test('reordering aisles changes the catalog and "Nicht in diesem Laden" order, n
   expect(groups[1]).toContain('Bbb')
 
   await openCatalog(page, 'Gänge')
+  // add snackbars would overlay the bottom rows and swallow the drag
+  await expect(page.getByTestId('snackbar')).toHaveCount(0, { timeout: 8000 })
   const rows = page.getByTestId('aisle-row')
   await dragHandle(
     page,

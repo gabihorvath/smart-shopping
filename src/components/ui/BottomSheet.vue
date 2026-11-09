@@ -47,32 +47,33 @@ function close() {
 
 <template>
   <div v-if="modelValue" class="fixed inset-0 z-40 flex flex-col justify-end">
-    <div class="absolute inset-0 bg-black/40" data-testid="sheet-backdrop" @click="close" />
+    <div class="absolute inset-0 bg-ink/35" data-testid="sheet-backdrop" @click="close" />
     <div
       ref="panel"
       role="dialog"
       aria-modal="true"
       :aria-label="title"
       tabindex="-1"
-      class="sheet-panel relative flex w-full flex-col rounded-t-2xl bg-white shadow-xl outline-none"
+      class="sheet-panel relative flex w-full flex-col rounded-t-3xl bg-card shadow-sheet outline-none"
       :class="full ? 'h-[92dvh]' : 'max-h-[85dvh]'"
       @keydown.esc.stop="close"
     >
-      <header class="flex shrink-0 items-center justify-between gap-2 px-4 pt-2 pb-1">
-        <h2 class="min-w-0 flex-1 truncate text-lg font-semibold text-gray-900">
+      <div aria-hidden="true" class="mx-auto mt-2.5 h-1.5 w-10 shrink-0 rounded-full bg-line" />
+      <header class="flex shrink-0 items-center justify-between gap-2 px-5 pt-1 pb-2">
+        <h2 class="min-w-0 flex-1 truncate text-xl font-bold tracking-tight text-ink">
           <slot name="title">{{ title }}</slot>
         </h2>
         <button
           type="button"
           aria-label="Schließen"
-          class="flex size-11 shrink-0 items-center justify-center rounded-full text-2xl text-gray-500 active:bg-gray-100"
+          class="flex size-11 shrink-0 items-center justify-center rounded-full bg-cream-deep text-2xl text-ink-muted active:bg-line"
           @click="close"
         >
           ×
         </button>
       </header>
       <div
-        class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+        class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(1rem,env(safe-area-inset-bottom))]"
       >
         <slot />
       </div>

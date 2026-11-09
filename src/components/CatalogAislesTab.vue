@@ -74,19 +74,18 @@ async function remove() {
   else sheetOpen.value = false
 }
 
-const field = 'h-12 w-full rounded-xl border-2 bg-white px-3 text-base outline-none'
+const field = 'h-12 w-full rounded-xl border-2 bg-card px-3 text-base text-ink outline-none'
 </script>
 
 <template>
   <div>
-    <h2
-      class="mt-2 bg-gray-100 px-4 py-1 text-xs font-semibold tracking-wide text-gray-600 uppercase"
-    >
+    <h2 class="mt-2 px-5 pt-4 pb-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
       Gänge (globale Reihenfolge)
     </h2>
     <VueDraggable
       v-model="list"
       tag="ul"
+      class="mx-4 divide-y divide-line overflow-hidden rounded-2xl bg-card shadow-card"
       handle=".drag-handle"
       :animation="150"
       :delay="0"
@@ -98,23 +97,23 @@ const field = 'h-12 w-full rounded-xl border-2 bg-white px-3 text-base outline-n
         :key="a.id"
         data-testid="aisle-row"
         :data-name="a.name"
-        class="flex min-h-12 items-center bg-white"
+        class="flex min-h-12 items-center bg-card"
       >
         <span
-          class="drag-handle flex size-11 shrink-0 cursor-grab touch-none items-center justify-center text-xl text-gray-500 select-none"
+          class="drag-handle flex size-11 shrink-0 cursor-grab touch-none items-center justify-center text-xl text-ink-muted select-none"
           role="img"
           :aria-label="`${a.name} verschieben`"
           data-testid="drag-handle"
           >≡</span
         >
-        <span class="min-w-0 flex-1 truncate text-base text-gray-900">{{ a.name }}</span>
-        <span class="shrink-0 pl-2 text-sm text-gray-500" data-testid="aisle-count">{{
+        <span class="min-w-0 flex-1 truncate text-base text-ink">{{ a.name }}</span>
+        <span class="shrink-0 pl-2 text-sm text-ink-muted" data-testid="aisle-count">{{
           counts.get(a.id) ?? 0
         }}</span>
         <button
           type="button"
           :aria-label="`${a.name} bearbeiten`"
-          class="flex size-11 shrink-0 items-center justify-center text-gray-600 active:bg-gray-100"
+          class="flex size-11 shrink-0 items-center justify-center text-ink-muted active:bg-cream-deep"
           @click="openEdit(a)"
         >
           ✎
@@ -126,7 +125,7 @@ const field = 'h-12 w-full rounded-xl border-2 bg-white px-3 text-base outline-n
       type="button"
       aria-label="Gang anlegen"
       data-testid="fab"
-      class="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex size-14 items-center justify-center rounded-full bg-green-600 text-3xl text-white shadow-lg active:bg-green-700"
+      class="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex size-14 items-center justify-center rounded-full bg-coral-500 text-3xl text-white shadow-fab transition active:scale-95 active:bg-coral-600"
       @click="openNew"
     >
       +
@@ -135,7 +134,7 @@ const field = 'h-12 w-full rounded-xl border-2 bg-white px-3 text-base outline-n
     <BottomSheet v-model="sheetOpen" :title="editing ? 'Gang bearbeiten' : 'Neuer Gang'">
       <form class="space-y-4 pt-2 pb-2" @submit.prevent="save">
         <label class="block">
-          <span class="text-sm text-gray-600">Name</span>
+          <span class="text-sm font-medium text-ink-muted">Name</span>
           <input
             v-model="name"
             data-testid="aisle-name"
@@ -143,7 +142,9 @@ const field = 'h-12 w-full rounded-xl border-2 bg-white px-3 text-base outline-n
             autocomplete="off"
             :class="[
               field,
-              nameError ? 'border-red-500' : 'border-gray-300 focus:border-green-600',
+              nameError
+                ? 'border-red-600'
+                : 'border-line focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15',
             ]"
             @input="nameError = null"
           />
@@ -152,7 +153,7 @@ const field = 'h-12 w-full rounded-xl border-2 bg-white px-3 text-base outline-n
         <div class="flex gap-2 pt-2">
           <button
             type="button"
-            class="min-h-12 rounded-xl px-4 font-medium text-gray-700 active:bg-gray-100"
+            class="min-h-12 rounded-xl bg-cream-deep px-4 font-semibold text-ink active:bg-line"
             @click="sheetOpen = false"
           >
             Abbrechen
@@ -161,7 +162,7 @@ const field = 'h-12 w-full rounded-xl border-2 bg-white px-3 text-base outline-n
             v-if="editing"
             type="button"
             data-testid="aisle-delete"
-            class="min-h-12 rounded-xl px-4 font-medium text-red-700 active:bg-gray-100"
+            class="min-h-12 rounded-xl px-4 font-semibold text-red-700 active:bg-red-50"
             @click="remove"
           >
             Löschen
@@ -169,7 +170,7 @@ const field = 'h-12 w-full rounded-xl border-2 bg-white px-3 text-base outline-n
           <button
             type="submit"
             :disabled="busy"
-            class="min-h-12 flex-1 rounded-xl bg-green-600 font-semibold text-white active:bg-green-700 disabled:bg-gray-300"
+            class="min-h-12 flex-1 rounded-xl bg-coral-500 font-semibold text-white active:bg-coral-600 disabled:bg-cream-deep disabled:text-ink-muted"
           >
             {{ editing ? 'Speichern' : 'Anlegen' }}
           </button>

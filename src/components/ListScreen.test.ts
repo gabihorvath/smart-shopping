@@ -24,8 +24,21 @@ describe('ListScreen', () => {
   it('shows the empty state and the shop name', async () => {
     const { pinia } = await fresh()
     const w = mount(ListScreen, { global: { plugins: [pinia] } })
-    expect(w.text()).toContain('Die Liste ist leer')
+    expect(w.text()).toContain('Deine Liste ist leer')
     expect(w.get('[data-testid="shop-selector"]').text()).toContain('Standard')
+  })
+
+  it('shows the all-done state when only checked entries remain', async () => {
+    const { s, pinia } = await fresh()
+    await s.addItem(idOf(s, 'Brot'), 1)
+    const w = mount(ListScreen, { global: { plugins: [pinia] } })
+    expect(w.find('[data-testid="all-done"]').exists()).toBe(false)
+    await w.get('[aria-label="Brot abhaken"]').trigger('click')
+    await flushPromises()
+    expect(w.get('[data-testid="all-done"]').text()).toContain('Alles erledigt!')
+    expect(w.text()).toContain('Super gemacht.')
+    expect(w.text()).not.toContain('Deine Liste ist leer')
+    expect(w.get('[data-testid="done"]').text()).toContain('Erledigt (1)')
   })
 
   it('renders open groups, the not-in-shop section and a collapsed done section', async () => {
@@ -44,7 +57,7 @@ describe('ListScreen', () => {
 
     const w = mount(ListScreen, { global: { plugins: [pinia] } })
     const text = w.text()
-    expect(text).not.toContain('Die Liste ist leer')
+    expect(text).not.toContain('Deine Liste ist leer')
     // open groups in shop order, then the dimmed section
     expect(text.indexOf('Obst & Gemüse')).toBeLessThan(text.indexOf('Milchprodukte & Eier'))
     expect(text).toContain('Äpfel')

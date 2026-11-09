@@ -3,7 +3,7 @@ import { dismissSnackbar, snackbars, type Snackbar } from '../../composables/use
 
 function act(s: Snackbar) {
   dismissSnackbar(s.id)
-  void s.onAction()
+  void s.onAction?.()
 }
 </script>
 
@@ -16,12 +16,13 @@ function act(s: Snackbar) {
       v-for="s in snackbars"
       :key="s.id"
       data-testid="snackbar"
-      class="pointer-events-auto flex w-full max-w-md items-center justify-between gap-3 rounded-lg bg-gray-900 py-1 pr-1 pl-4 text-sm text-white shadow-lg"
+      class="pointer-events-auto flex w-full max-w-md items-center justify-between gap-3 rounded-2xl bg-ink py-1 pr-1 pl-4 text-sm text-white shadow-card"
     >
-      <span class="truncate">{{ s.text }}</span>
+      <span class="truncate py-2">{{ s.text }}</span>
       <button
+        v-if="s.actionLabel"
         type="button"
-        class="min-h-11 shrink-0 rounded-md px-3 font-semibold text-green-400 active:bg-white/10"
+        class="min-h-11 shrink-0 rounded-xl px-3 font-semibold text-coral-100 active:bg-white/10"
         @click="act(s)"
       >
         {{ s.actionLabel }}

@@ -61,19 +61,17 @@ async function remove() {
   else sheetOpen.value = false
 }
 
-const field = 'h-12 w-full rounded-xl border-2 bg-white px-3 text-base outline-none'
-const ok = 'border-gray-300 focus:border-green-600'
-const bad = 'border-red-500'
+const field = 'h-12 w-full rounded-xl border-2 bg-card px-3 text-base text-ink outline-none'
+const ok = 'border-line focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15'
+const bad = 'border-red-600'
 </script>
 
 <template>
   <div>
-    <h2
-      class="mt-2 bg-gray-100 px-4 py-1 text-xs font-semibold tracking-wide text-gray-600 uppercase"
-    >
+    <h2 class="mt-2 px-5 pt-4 pb-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
       Einheiten (Schrittweite)
     </h2>
-    <ul>
+    <ul class="mx-4 divide-y divide-line overflow-hidden rounded-2xl bg-card shadow-card">
       <li
         v-for="u in units"
         :key="u.id"
@@ -81,14 +79,14 @@ const bad = 'border-red-500'
         :data-name="u.name"
         class="flex min-h-12 items-center pl-4"
       >
-        <span class="min-w-0 flex-1 truncate text-base text-gray-900">{{ u.name }}</span>
-        <span class="shrink-0 pl-2 text-sm text-gray-500" data-testid="unit-step">{{
+        <span class="min-w-0 flex-1 truncate text-base text-ink">{{ u.name }}</span>
+        <span class="shrink-0 pl-2 text-sm text-ink-muted" data-testid="unit-step">{{
           formatAmount(u.step)
         }}</span>
         <button
           type="button"
           :aria-label="`${u.name} bearbeiten`"
-          class="flex size-11 shrink-0 items-center justify-center text-gray-600 active:bg-gray-100"
+          class="flex size-11 shrink-0 items-center justify-center text-ink-muted active:bg-cream-deep"
           @click="openEdit(u)"
         >
           ✎
@@ -100,7 +98,7 @@ const bad = 'border-red-500'
       type="button"
       aria-label="Einheit anlegen"
       data-testid="fab"
-      class="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex size-14 items-center justify-center rounded-full bg-green-600 text-3xl text-white shadow-lg active:bg-green-700"
+      class="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex size-14 items-center justify-center rounded-full bg-coral-500 text-3xl text-white shadow-fab transition active:scale-95 active:bg-coral-600"
       @click="openNew"
     >
       +
@@ -109,7 +107,7 @@ const bad = 'border-red-500'
     <BottomSheet v-model="sheetOpen" :title="editing ? 'Einheit bearbeiten' : 'Neue Einheit'">
       <form class="space-y-4 pt-2 pb-2" @submit.prevent="save">
         <label class="block">
-          <span class="text-sm text-gray-600">Name</span>
+          <span class="text-sm font-medium text-ink-muted">Name</span>
           <input
             v-model="name"
             data-testid="unit-name"
@@ -121,7 +119,7 @@ const bad = 'border-red-500'
           <span v-if="nameError" class="text-sm text-red-600" role="alert">{{ nameError }}</span>
         </label>
         <label class="block">
-          <span class="text-sm text-gray-600">Schrittweite</span>
+          <span class="text-sm font-medium text-ink-muted">Schrittweite</span>
           <input
             v-model="stepText"
             inputmode="decimal"
@@ -137,7 +135,7 @@ const bad = 'border-red-500'
         <div class="flex gap-2 pt-2">
           <button
             type="button"
-            class="min-h-12 rounded-xl px-4 font-medium text-gray-700 active:bg-gray-100"
+            class="min-h-12 rounded-xl bg-cream-deep px-4 font-semibold text-ink active:bg-line"
             @click="sheetOpen = false"
           >
             Abbrechen
@@ -146,7 +144,7 @@ const bad = 'border-red-500'
             v-if="editing"
             type="button"
             data-testid="unit-delete"
-            class="min-h-12 rounded-xl px-4 font-medium text-red-700 active:bg-gray-100"
+            class="min-h-12 rounded-xl px-4 font-semibold text-red-700 active:bg-red-50"
             @click="remove"
           >
             Löschen
@@ -154,7 +152,7 @@ const bad = 'border-red-500'
           <button
             type="submit"
             :disabled="busy || !stepValid"
-            class="min-h-12 flex-1 rounded-xl bg-green-600 font-semibold text-white active:bg-green-700 disabled:bg-gray-300"
+            class="min-h-12 flex-1 rounded-xl bg-coral-500 font-semibold text-white active:bg-coral-600 disabled:bg-cream-deep disabled:text-ink-muted"
           >
             {{ editing ? 'Speichern' : 'Anlegen' }}
           </button>

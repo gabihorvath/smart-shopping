@@ -46,7 +46,7 @@ function bump(dir: 1 | -1) {
     <button
       type="button"
       aria-label="Weniger"
-      class="flex size-12 items-center justify-center rounded-xl bg-gray-100 text-2xl text-gray-800 active:bg-gray-200"
+      class="flex size-12 items-center justify-center rounded-xl bg-cream-deep text-2xl font-semibold text-ink active:bg-line"
       @click="bump(-1)"
     >
       −
@@ -59,17 +59,19 @@ function bump(dir: 1 | -1) {
       aria-label="Menge"
       :aria-invalid="invalid"
       data-testid="amount-input"
-      class="h-12 w-28 rounded-xl border-2 px-3 text-center text-xl outline-none"
+      class="h-12 w-28 rounded-xl border-2 px-3 text-center text-xl font-semibold text-ink outline-none"
       :class="
-        invalid ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white focus:border-green-600'
+        invalid
+          ? 'border-red-600 bg-red-50'
+          : 'border-line bg-card focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15'
       "
       @input="onInput"
     />
-    <span class="w-14 text-lg text-gray-700">{{ unitName }}</span>
+    <span class="w-14 text-lg text-ink-muted">{{ unitName }}</span>
     <button
       type="button"
       aria-label="Mehr"
-      class="flex size-12 items-center justify-center rounded-xl bg-gray-100 text-2xl text-gray-800 active:bg-gray-200"
+      class="flex size-12 items-center justify-center rounded-xl bg-cream-deep text-2xl font-semibold text-ink active:bg-line"
       @click="bump(1)"
     >
       +

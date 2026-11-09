@@ -72,15 +72,15 @@ async function submit() {
   }
 }
 
-const field = 'h-12 w-full rounded-xl border-2 bg-white px-3 text-base outline-none'
-const ok = 'border-gray-300 focus:border-green-600'
-const bad = 'border-red-500'
+const field = 'h-12 w-full rounded-xl border-2 bg-card px-3 text-base text-ink outline-none'
+const ok = 'border-line focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15'
+const bad = 'border-red-600'
 </script>
 
 <template>
   <form class="space-y-4 pt-2 pb-2" @submit.prevent="submit">
     <label class="block">
-      <span class="text-sm text-gray-600">Name</span>
+      <span class="text-sm font-medium text-ink-muted">Name</span>
       <input
         v-model="name"
         data-testid="new-item-name"
@@ -91,7 +91,7 @@ const bad = 'border-red-500'
     </label>
 
     <label class="block">
-      <span class="text-sm text-gray-600">Einheit</span>
+      <span class="text-sm font-medium text-ink-muted">Einheit</span>
       <select v-model="unitId" data-testid="new-item-unit" :class="[field, ok]">
         <option v-for="u in store.units" :key="u.id" :value="u.id">{{ u.name }}</option>
         <option :value="NEW">Neu…</option>
@@ -111,13 +111,13 @@ const bad = 'border-red-500'
         inputmode="decimal"
         aria-label="Schritt der neuen Einheit"
         data-testid="new-unit-step"
-        class="h-12 w-24 shrink-0 rounded-xl border-2 border-gray-300 px-3 text-base outline-none focus:border-green-600"
+        class="h-12 w-24 shrink-0 rounded-xl border-2 border-line bg-card px-3 text-base text-ink outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
       />
     </div>
     <p v-if="errors.unit" class="text-sm text-red-600" role="alert">{{ errors.unit }}</p>
 
     <label class="block">
-      <span class="text-sm text-gray-600">Gang</span>
+      <span class="text-sm font-medium text-ink-muted">Gang</span>
       <select v-model="aisleId" data-testid="new-item-aisle" :class="[field, ok]">
         <option v-for="a in sortedAisles" :key="a.id" :value="a.id">{{ a.name }}</option>
         <option :value="NEW">Neu…</option>
@@ -137,7 +137,7 @@ const bad = 'border-red-500'
     <div class="flex gap-2 pt-2">
       <button
         type="button"
-        class="min-h-12 rounded-xl px-4 font-medium text-gray-700 active:bg-gray-100"
+        class="min-h-12 rounded-xl bg-cream-deep px-4 font-semibold text-ink active:bg-line"
         @click="emit('cancel')"
       >
         {{ cancelLabel ?? 'Zurück' }}
@@ -146,7 +146,7 @@ const bad = 'border-red-500'
         v-if="item"
         type="button"
         data-testid="item-delete"
-        class="min-h-12 rounded-xl px-4 font-medium text-red-700 active:bg-gray-100"
+        class="min-h-12 rounded-xl px-4 font-semibold text-red-700 active:bg-red-50"
         @click="emit('delete')"
       >
         Löschen
@@ -154,7 +154,7 @@ const bad = 'border-red-500'
       <button
         type="submit"
         :disabled="busy"
-        class="min-h-12 flex-1 rounded-xl bg-green-600 font-semibold text-white active:bg-green-700 disabled:bg-gray-300"
+        class="min-h-12 flex-1 rounded-xl bg-coral-500 font-semibold text-white active:bg-coral-600 disabled:bg-cream-deep disabled:text-ink-muted"
       >
         {{ item ? 'Speichern' : 'Anlegen' }}
       </button>

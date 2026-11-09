@@ -75,22 +75,22 @@ async function remove() {
 </script>
 
 <template>
-  <div v-if="shop" class="min-h-dvh bg-white pb-[max(1rem,env(safe-area-inset-bottom))]">
+  <div v-if="shop" class="min-h-dvh bg-cream pb-[max(1rem,env(safe-area-inset-bottom))]">
     <header
-      class="sticky top-0 z-20 flex items-center gap-1 bg-green-600 px-2 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 text-white"
+      class="sticky top-0 z-20 flex items-center gap-3 bg-cream/90 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-3 text-ink backdrop-blur"
     >
       <button
         type="button"
         aria-label="Zurück"
-        class="flex size-11 shrink-0 items-center justify-center rounded-lg text-2xl active:bg-green-700"
+        class="flex size-11 shrink-0 items-center justify-center rounded-full bg-card text-2xl text-ink shadow-card active:bg-cream-deep"
         @click="emit('back')"
       >
         ‹
       </button>
-      <h1 class="min-w-0 flex-1 truncate text-lg font-semibold">{{ shop.name }}</h1>
+      <h1 class="min-w-0 flex-1 truncate text-2xl font-bold tracking-tight">{{ shop.name }}</h1>
       <button
         type="button"
-        class="min-h-11 shrink-0 rounded-lg px-3 font-medium active:bg-green-700"
+        class="min-h-11 shrink-0 rounded-xl px-3 font-semibold text-red-700 active:bg-red-50"
         @click="remove"
       >
         Löschen
@@ -98,14 +98,18 @@ async function remove() {
     </header>
 
     <div class="px-4 pt-4">
-      <label for="shop-name" class="text-sm text-gray-600">Name</label>
+      <label for="shop-name" class="text-sm font-medium text-ink-muted">Name</label>
       <input
         id="shop-name"
         v-model="nameInput"
         data-testid="shop-name"
         autocomplete="off"
-        class="mt-1 min-h-11 w-full rounded-lg border px-3 text-base"
-        :class="error ? 'border-red-500' : 'border-gray-300'"
+        class="mt-1 h-12 w-full rounded-xl border-2 bg-card px-3 text-base text-ink outline-none"
+        :class="
+          error
+            ? 'border-red-600'
+            : 'border-line focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15'
+        "
         @input="error = null"
         @keydown.enter.prevent="($event.target as HTMLInputElement).blur()"
         @blur="rename"
@@ -113,14 +117,13 @@ async function remove() {
       <p v-if="error" class="mt-1 text-sm text-red-600" role="alert">{{ error }}</p>
     </div>
 
-    <h2
-      class="mt-4 bg-gray-100 px-4 py-1 text-xs font-semibold tracking-wide text-gray-600 uppercase"
-    >
+    <h2 class="mt-4 px-5 pt-4 pb-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
       Im Laden (Reihenfolge)
     </h2>
     <VueDraggable
       v-model="included"
       tag="ul"
+      class="mx-4 divide-y divide-line overflow-hidden rounded-2xl bg-card shadow-card"
       handle=".drag-handle"
       :animation="150"
       :delay="0"
@@ -132,16 +135,16 @@ async function remove() {
         :key="a.id"
         data-testid="included-aisle"
         :data-name="a.name"
-        class="flex min-h-12 items-center bg-white"
+        class="flex min-h-12 items-center bg-card"
       >
         <span
-          class="drag-handle flex size-11 shrink-0 cursor-grab touch-none items-center justify-center text-xl text-gray-500 select-none"
+          class="drag-handle flex size-11 shrink-0 cursor-grab touch-none items-center justify-center text-xl text-ink-muted select-none"
           role="img"
           :aria-label="`${a.name} verschieben`"
           data-testid="drag-handle"
           >≡</span
         >
-        <span class="min-w-0 flex-1 truncate text-base text-gray-900">{{ a.name }}</span>
+        <span class="min-w-0 flex-1 truncate text-base text-ink">{{ a.name }}</span>
         <button
           type="button"
           role="checkbox"
@@ -151,19 +154,17 @@ async function remove() {
           @click="toggle(a, false)"
         >
           <span
-            class="flex size-6 items-center justify-center rounded border-2 border-green-600 bg-green-600 text-xs text-white"
+            class="flex size-6 items-center justify-center rounded-md border-2 border-blue-500 bg-blue-500 text-xs text-white"
             >✓</span
           >
         </button>
       </li>
     </VueDraggable>
 
-    <h2
-      class="mt-4 bg-gray-100 px-4 py-1 text-xs font-semibold tracking-wide text-gray-600 uppercase"
-    >
+    <h2 class="mt-4 px-5 pt-4 pb-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
       Nicht im Laden
     </h2>
-    <ul>
+    <ul class="mx-4 divide-y divide-line overflow-hidden rounded-2xl bg-card shadow-card">
       <li
         v-for="a in excluded"
         :key="a.id"
@@ -172,7 +173,7 @@ async function remove() {
         class="flex min-h-12 items-center"
       >
         <span class="size-11 shrink-0" />
-        <span class="min-w-0 flex-1 truncate text-base text-gray-700">{{ a.name }}</span>
+        <span class="min-w-0 flex-1 truncate text-base text-ink-muted">{{ a.name }}</span>
         <button
           type="button"
           role="checkbox"
@@ -181,7 +182,7 @@ async function remove() {
           :aria-label="`${a.name} im Laden`"
           @click="toggle(a, true)"
         >
-          <span class="size-6 rounded border-2 border-gray-400" />
+          <span class="size-6 rounded-md border-2 border-ink-muted/40" />
         </button>
       </li>
     </ul>

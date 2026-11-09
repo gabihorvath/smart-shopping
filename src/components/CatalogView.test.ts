@@ -157,7 +157,7 @@ describe('Einheiten tab', () => {
     await setInput('[data-testid="unit-name"]', 'Becher')
     for (const bad of ['abc', '0', '']) {
       await setInput('[data-testid="unit-step-input"]', bad)
-      expect(q('[data-testid="unit-step-input"]').className).toContain('border-red-500')
+      expect(q('[data-testid="unit-step-input"]').className).toContain('border-red-600')
       expect((buttonByText('Anlegen') as HTMLButtonElement).disabled).toBe(true)
     }
     expect(s.units.some((u) => u.name === 'Becher')).toBe(false)

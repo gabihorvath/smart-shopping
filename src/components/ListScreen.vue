@@ -21,6 +21,9 @@ const editEntryId = ref<string | null>(null)
 
 const view = computed(() => store.listView)
 const doneCount = computed(() => view.value.done.reduce((n, g) => n + g.rows.length, 0))
+const allDone = computed(
+  () => !view.value.open.length && !view.value.notInShop.length && doneCount.value > 0,
+)
 const isEmpty = computed(
   () => !view.value.open.length && !view.value.notInShop.length && !doneCount.value,
 )
@@ -79,19 +82,19 @@ function go(v: 'shops' | 'catalog') {
 </script>
 
 <template>
-  <div class="flex min-h-dvh flex-col bg-white">
+  <div class="flex min-h-dvh flex-col bg-cream">
     <header
-      class="sticky top-0 z-20 flex items-center justify-between gap-2 bg-green-600 px-3 pt-[max(0.5rem,env(safe-area-inset-top))] pr-[max(0.75rem,env(safe-area-inset-right))] pb-2 pl-[max(0.75rem,env(safe-area-inset-left))] text-white"
+      class="sticky top-0 z-20 flex items-center justify-between gap-2 bg-cream/90 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-3 pl-[max(1rem,env(safe-area-inset-left))] text-ink backdrop-blur"
     >
       <button
         type="button"
         data-testid="shop-selector"
-        class="flex min-h-11 min-w-0 items-center gap-2 rounded-lg px-3 text-lg font-semibold active:bg-green-700"
+        class="flex min-h-11 min-w-0 items-center gap-2 rounded-xl text-2xl font-bold tracking-tight active:opacity-60"
         aria-haspopup="dialog"
         @click="shopSheetOpen = true"
       >
         <span class="truncate">{{ store.activeShop?.name }}</span>
-        <span aria-hidden="true" class="text-sm">▾</span>
+        <span aria-hidden="true" class="text-sm text-coral-700">▾</span>
       </button>
       <div class="relative">
         <button
@@ -99,7 +102,7 @@ function go(v: 'shops' | 'catalog') {
           aria-label="Menü"
           aria-haspopup="menu"
           :aria-expanded="menuOpen"
-          class="flex size-11 items-center justify-center rounded-lg text-2xl active:bg-green-700"
+          class="flex size-11 items-center justify-center rounded-full bg-card text-2xl shadow-card active:bg-cream-deep"
           @click="menuOpen = !menuOpen"
         >
           ≡
@@ -108,12 +111,12 @@ function go(v: 'shops' | 'catalog') {
           <div class="fixed inset-0 z-30" @click="menuOpen = false" />
           <div
             role="menu"
-            class="absolute right-0 z-40 mt-1 w-44 overflow-hidden rounded-xl bg-white py-1 text-gray-900 shadow-lg"
+            class="absolute right-0 z-40 mt-2 w-48 overflow-hidden rounded-2xl bg-card py-1 text-ink shadow-sheet"
           >
             <button
               type="button"
               role="menuitem"
-              class="flex min-h-12 w-full items-center px-4 text-left active:bg-gray-100"
+              class="flex min-h-12 w-full items-center px-4 text-left font-medium active:bg-cream-deep"
               @click="go('shops')"
             >
               Läden
@@ -121,7 +124,7 @@ function go(v: 'shops' | 'catalog') {
             <button
               type="button"
               role="menuitem"
-              class="flex min-h-12 w-full items-center px-4 text-left active:bg-gray-100"
+              class="flex min-h-12 w-full items-center px-4 text-left font-medium active:bg-cream-deep"
               @click="go('catalog')"
             >
               Katalog
@@ -132,7 +135,20 @@ function go(v: 'shops' | 'catalog') {
     </header>
 
     <main class="flex-1 pb-[calc(6rem+env(safe-area-inset-bottom))]">
-      <p v-if="isEmpty" class="px-4 py-16 text-center text-gray-500">Die Liste ist leer</p>
+      <div v-if="isEmpty" class="px-8 py-16 text-center" data-testid="empty-state">
+        <div
+          aria-hidden="true"
+          class="mx-auto flex size-20 items-center justify-center rounded-full bg-coral-50 text-4xl"
+        >
+          🛒
+        </div>
+        <p class="mt-5 text-xl font-bold tracking-tight text-ink">Deine Liste ist leer</p>
+        <p class="mt-1 text-ink-muted">Tippe auf +, um loszulegen.</p>
+      </div>
+      <div v-else-if="allDone" class="px-8 py-10 text-center" data-testid="all-done">
+        <p class="text-xl font-bold tracking-tight text-ink">Alles erledigt! 🎉</p>
+        <p class="mt-1 text-ink-muted">Super gemacht.</p>
+      </div>
 
       <AisleGroups
         :groups="view.open"
@@ -142,8 +158,8 @@ function go(v: 'shops' | 'catalog') {
         @remove="remove"
       />
 
-      <section v-if="view.notInShop.length" class="mt-4 opacity-60" data-testid="not-in-shop">
-        <h2 class="px-4 pt-2 text-sm font-semibold tracking-wide text-gray-600 uppercase">
+      <section v-if="view.notInShop.length" class="mt-2 opacity-60" data-testid="not-in-shop">
+        <h2 class="px-8 pt-2 pb-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
           Nicht in diesem Laden
         </h2>
         <AisleGroups
@@ -155,11 +171,11 @@ function go(v: 'shops' | 'catalog') {
         />
       </section>
 
-      <section v-if="doneCount" class="mt-4 opacity-60" data-testid="done">
-        <div class="flex items-center justify-between px-4">
+      <section v-if="doneCount" class="mt-2 opacity-60" data-testid="done">
+        <div class="flex items-center justify-between pr-4 pl-8">
           <button
             type="button"
-            class="flex min-h-11 items-center gap-2 text-sm font-semibold tracking-wide text-gray-600 uppercase"
+            class="flex min-h-11 items-center gap-2 text-xs font-semibold tracking-wide text-ink-muted uppercase"
             :aria-expanded="doneOpen"
             @click="doneOpen = !doneOpen"
           >
@@ -168,7 +184,7 @@ function go(v: 'shops' | 'catalog') {
           </button>
           <button
             type="button"
-            class="min-h-11 rounded-lg px-3 text-sm font-medium text-red-700 active:bg-gray-100"
+            class="min-h-11 rounded-xl px-3 text-sm font-semibold text-red-700 active:bg-red-50"
             @click="clearDone"
           >
             Entfernen
@@ -189,7 +205,7 @@ function go(v: 'shops' | 'catalog') {
       type="button"
       aria-label="Artikel hinzufügen"
       data-testid="fab"
-      class="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex size-14 items-center justify-center rounded-full bg-green-600 text-3xl text-white shadow-lg active:bg-green-700"
+      class="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex size-14 items-center justify-center rounded-full bg-coral-500 text-3xl text-white shadow-fab transition active:scale-95 active:bg-coral-600"
       @click="addOpen = true"
     >
       +

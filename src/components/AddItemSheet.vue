@@ -6,6 +6,7 @@ import type { CatalogGroup } from '../domain/view'
 import { buildCatalogForAdd } from '../domain/view'
 import type { CatalogItem } from '../domain/types'
 import { useDialog } from '../composables/useDialog'
+import { useSnackbars } from '../composables/useSnackbars'
 import { useAppStore } from '../stores/app'
 import AmountStep from './AmountStep.vue'
 import NewItemForm from './NewItemForm.vue'
@@ -16,6 +17,7 @@ const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
 
 const store = useAppStore()
 const dialog = useDialog()
+const snackbars = useSnackbars()
 
 const step = ref<'search' | 'new' | 'amount'>('search')
 const query = ref('')
@@ -92,7 +94,10 @@ async function add(amount: number) {
     const r = await store.addItem(item.id, amount)
     if (r.status !== 'needsConfirm') {
       if (r.status === 'invalid') error.value = r.error
-      else reset()
+      else {
+        snackbars.push(`„${item.name}“ ist auf der Liste ✓`)
+        reset()
+      }
       return
     }
     const yes = await dialog.confirm(
@@ -101,8 +106,10 @@ async function add(amount: number) {
     )
     if (!yes) return
     const res = await store.confirmAddAmount(item.id, amount)
-    if (res.ok) reset()
-    else error.value = res.error
+    if (res.ok) {
+      snackbars.push(`„${item.name}“ ist auf der Liste ✓`)
+      reset()
+    } else error.value = res.error
   } finally {
     busy.value = false
   }
@@ -121,7 +128,7 @@ function created(item: CatalogItem) {
     @update:model-value="emit('update:modelValue', $event)"
   >
     <template v-if="step === 'search'">
-      <div class="sticky top-0 z-10 -mx-4 bg-white px-4 pb-2">
+      <div class="sticky top-0 z-10 -mx-5 bg-card px-5 pb-2">
         <input
           ref="searchEl"
           v-model="query"
@@ -131,7 +138,7 @@ function created(item: CatalogItem) {
           placeholder="Suche…"
           aria-label="Suche"
           autocomplete="off"
-          class="h-12 w-full rounded-xl border-2 border-gray-300 bg-white px-3 text-base outline-none focus:border-green-600"
+          class="h-12 w-full rounded-xl border-2 border-line bg-card px-4 text-base text-ink outline-none placeholder:text-ink-muted focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
         />
       </div>
 
@@ -139,7 +146,7 @@ function created(item: CatalogItem) {
         v-if="showCreate"
         type="button"
         data-testid="create-new"
-        class="mb-2 flex min-h-12 w-full items-center rounded-xl bg-green-50 px-3 text-left font-medium text-green-800 active:bg-green-100"
+        class="mb-2 flex min-h-12 w-full items-center rounded-xl bg-coral-50 px-4 text-left font-semibold text-coral-700 active:bg-coral-100"
         @click="step = 'new'"
       >
         + „{{ query.trim() }}“ neu anlegen
@@ -151,23 +158,23 @@ function created(item: CatalogItem) {
           :key="g.aisle.id"
           :class="key === 'notInShop' ? 'opacity-60' : ''"
         >
-          <h3 class="pt-3 pb-1 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+          <h3 class="pt-3 pb-1 text-xs font-semibold tracking-wide text-ink-muted uppercase">
             {{ g.aisle.name }}
           </h3>
           <ul>
             <li v-for="item in g.items" :key="item.id">
               <button
                 type="button"
-                class="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2 py-1 text-left active:bg-gray-100"
+                class="flex min-h-11 w-full items-center justify-between gap-3 rounded-xl px-2 py-1 text-left active:bg-cream-deep"
                 @click="pick(item)"
               >
                 <span class="min-w-0">
-                  <span class="block truncate text-base text-gray-900">{{ item.name }}</span>
-                  <span v-if="hint(item)" class="block text-xs text-green-700">{{
+                  <span class="block truncate text-base font-medium text-ink">{{ item.name }}</span>
+                  <span v-if="hint(item)" class="block text-xs font-medium text-blue-700">{{
                     hint(item)
                   }}</span>
                 </span>
-                <span v-if="searching" class="shrink-0 text-xs text-gray-500">{{
+                <span v-if="searching" class="shrink-0 text-xs text-ink-muted">{{
                   g.aisle.name
                 }}</span>
               </button>
@@ -175,8 +182,8 @@ function created(item: CatalogItem) {
           </ul>
         </section>
       </template>
-      <p v-if="!hasResults && !showCreate" class="py-6 text-center text-gray-500">
-        Keine Artikel gefunden.
+      <p v-if="!hasResults && !showCreate" class="py-6 text-center text-ink-muted">
+        Nichts gefunden – leg es einfach neu an.
       </p>
     </template>
 
