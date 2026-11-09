@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { parseAmount, stepDown, stepUp, validateAmount } from '../../domain/amount'
+import { parseAmount, stepDown, stepUp, toInputText, validateAmount } from '../../domain/amount'
 
 const props = defineProps<{
   /** Parsed amount, or null while the text is invalid. */
@@ -10,8 +10,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: number | null] }>()
 
-/** German decimal comma, no thousands separator (so it parses back correctly). */
-const toText = (n: number) => String(n).replace('.', ',')
+const toText = toInputText
 
 const text = ref(props.modelValue == null ? '' : toText(props.modelValue))
 

@@ -271,8 +271,7 @@ test('deleting an aisle in use is blocked with the count; unused one is removed 
   await page.getByRole('button', { name: 'Standard bearbeiten' }).click()
   await page.getByRole('checkbox', { name: 'Leer im Laden' }).click()
   await expect(page.getByTestId('included-aisle').last()).toHaveAttribute('data-name', 'Leer')
-  await page.getByRole('button', { name: 'Zurück' }).click()
-  await page.getByRole('button', { name: 'Zurück' }).click()
+  await page.getByRole('button', { name: 'Zurück' }).click() // editor opened from the selector -> list
   await openCatalog(page, 'Gänge')
   await page.getByRole('button', { name: 'Leer bearbeiten' }).click()
   await page.getByTestId('aisle-delete').click()

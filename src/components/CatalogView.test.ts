@@ -34,9 +34,18 @@ async function setInput(sel: string, value: string) {
 /** Click, then wait for the (fake-indexeddb backed) store write and the re-render. */
 async function click(el: Element | null) {
   ;(el as HTMLElement).click()
-  await flushPromises()
-  await new Promise((r) => setTimeout(r, 30))
-  await flushPromises()
+  await settled()
+}
+/** Flush until the DOM stops changing (no fixed sleeps): async store writes and re-renders are done. */
+async function settled() {
+  let last = ''
+  let stable = 0
+  for (let i = 0; i < 200 && stable < 5; i++) {
+    await flushPromises()
+    const now = document.body.innerHTML
+    stable = now === last ? stable + 1 : 0
+    last = now
+  }
 }
 const buttonByText = (text: string) =>
   [...body().querySelectorAll('button')].find((b) => b.textContent?.trim() === text) ?? null
@@ -163,6 +172,17 @@ describe('Einheiten tab', () => {
     await click(buttonByText('Speichern'))
     const u = s.units.find((x) => x.name === 'Kilo')!
     expect(u.step).toBe(0.1)
+  })
+
+  it('editing a unit with step 1000 keeps the step (no grouped text)', async () => {
+    const { s, w } = await fresh()
+    await s.updateUnit(s.units.find((u) => u.name === 'kg')!.id, { name: 'kg', step: 1000 })
+    await tab(w, 'units')
+    await w.get('[aria-label="kg bearbeiten"]').trigger('click')
+    await flushPromises()
+    expect((q('[data-testid="unit-step-input"]') as HTMLInputElement).value).toBe('1000')
+    await click(buttonByText('Speichern'))
+    expect(s.units.find((u) => u.name === 'kg')!.step).toBe(1000)
   })
 
   it('blocked delete shows the count', async () => {

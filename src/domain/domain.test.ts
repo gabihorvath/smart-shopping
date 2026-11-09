@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { formatAmount, parseAmount, roundAmount, stepDown, stepUp, validateAmount } from './amount'
+import {
+  formatAmount,
+  parseAmount,
+  roundAmount,
+  stepDown,
+  stepUp,
+  toInputText,
+  validateAmount,
+} from './amount'
 import { buildSeed } from './seed'
 import { compareNames, foldForSearch, namesEqual, normalizeName } from './text'
 import type { Aisle, CatalogItem, ListEntry, Shop, Unit } from './types'
@@ -27,6 +35,10 @@ describe('amount', () => {
     expect(formatAmount(0.125)).toBe('0,125')
     expect(formatAmount(1000)).toBe('1.000')
     expect(formatAmount(1.0004)).toBe('1')
+  })
+  it('toInputText round-trips through parseAmount (no grouping)', () => {
+    for (const n of [1000, 1.5, 0.125, 1234567]) expect(parseAmount(toInputText(n))).toBe(n)
+    expect(toInputText(1000)).toBe('1000')
   })
   it('validates against step', () => {
     expect(validateAmount(1, 1)).toBe(true)

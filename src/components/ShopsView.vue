@@ -5,8 +5,7 @@ import ShopEditor from './ShopEditor.vue'
 
 const store = useAppStore()
 
-// Back rule (single target): editor -> shop list -> main list, regardless of whether the
-// editor was opened from the selector sheet or from this list.
+// Back from the editor returns to where it was opened from (store.editorOrigin).
 </script>
 
 <template>
@@ -14,7 +13,7 @@ const store = useAppStore()
     v-if="store.editingShopId"
     :key="store.editingShopId"
     :shop-id="store.editingShopId"
-    @back="store.editShop(null)"
+    @back="store.closeEditor()"
   />
   <div v-else class="min-h-dvh bg-white pb-[max(1rem,env(safe-area-inset-bottom))]">
     <header

@@ -145,6 +145,16 @@ describe('entries / add rules', () => {
     expect(await s.restoreEntry(removed)).toEqual({ ok: false, error: MSG.alreadyOnList })
   })
 
+  it('restore reports a deleted catalog item clearly', async () => {
+    const s = await fresh()
+    const id = itemNamed(s, 'Milch').id
+    await s.addItem(id, 1)
+    const removed = (await s.removeEntry(s.entries[0]!.id))!
+    expect((await s.deleteItem(id)).ok).toBe(true)
+    expect(await s.restoreEntry(removed)).toEqual({ ok: false, error: MSG.itemDeleted })
+    expect(MSG.itemDeleted).toBe('Artikel existiert nicht mehr.')
+  })
+
   it('listView reflects shop and entries', async () => {
     const s = await fresh()
     await s.addItem(itemNamed(s, 'Milch').id, 1)
@@ -383,5 +393,33 @@ describe('persistence round-trip', () => {
     expect(all.entries).toHaveLength(1)
     await expect(db.add('entries', { ...all.entries[0]!, id: 'dup' })).rejects.toThrow()
     db.close()
+  })
+})
+
+describe('shop editor navigation', () => {
+  it('back returns to where the editor was opened from', async () => {
+    const s = await fresh()
+    const id = s.shops[0]!.id
+    s.editShop(id, 'list')
+    expect(s.view).toBe('shops')
+    s.closeEditor()
+    expect(s.view).toBe('list')
+    expect(s.editingShopId).toBeNull()
+
+    s.setView('shops')
+    s.editShop(id)
+    s.closeEditor()
+    expect(s.view).toBe('shops')
+    expect(s.editingShopId).toBeNull()
+  })
+
+  it('applies the same rule after deleting the shop', async () => {
+    const s = await fresh()
+    const r = await s.createShop('Rewe')
+    if (!r.ok) throw new Error('create failed')
+    s.editShop(r.shop.id, 'list')
+    await s.deleteShop(r.shop.id)
+    s.closeEditor()
+    expect(s.view).toBe('list')
   })
 })

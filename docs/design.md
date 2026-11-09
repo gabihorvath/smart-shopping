@@ -19,7 +19,8 @@ Decisions made in the implementation kickoff (2026-11-09), these override anythi
 - **Amount of a checked entry**: tapping it opens the amount sheet; saving reopens the entry with the new amount.
 - **Invalid amounts** (empty, unparsable, <= 0, below the unit's step): field marked red, the confirm button is disabled. No silent clamping.
 - **Navigation**: no router; a view state in the store switches between list, shops and catalog.
-- **Tests**: Vitest for store/logic (IndexedDB via `fake-indexeddb`) plus component tests; Playwright E2E for the main flows.
+- **Shop editor back**: returns to where the editor was opened from (selector sheet → main list; Menü → Läden → shop list).
+- **Tests**: Playwright E2E runs locally only, not in the deploy workflow. Vitest for store/logic (IndexedDB via `fake-indexeddb`) plus component tests; Playwright E2E for the main flows.
 
 ---
 
