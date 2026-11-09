@@ -8,6 +8,19 @@ Decisions made in the Task 1 session:
 - Add flow: search field + amount sheet, with inline "new item".
 - Amount input: decimal field plus +/- buttons with a per-unit step.
 
+Decisions made in the implementation kickoff (2026-11-09), these override anything below:
+- **Erledigt** is grouped by aisle (shop order, then skipped aisles by `sortKey`), items A–Z inside each aisle. `checkedAt` is stored but not used for ordering.
+- **Remove an open item**: both swipe left and an "x" button. Swipe must not break vertical scrolling.
+- **Dialogs** (confirmations, duplicate-add prompt, blocked-deletion messages): custom Tailwind modals/sheets, never native `confirm()`/`alert()`/`prompt()`.
+- **Undo snackbars stack**: every removal gets its own snackbar with "Rückgängig", each visible for the full 5 s independently. Each removal becomes final when its own snackbar expires.
+- **Search** strips diacritics and ignores case ("apfel" finds "Äpfel"), contains-match. No "ae" → "ä" mapping.
+- **Add flow, empty search**: the shop's aisles in shop order, then skipped aisles dimmed (by `sortKey`), items A–Z within each aisle.
+- **Inline name inputs** for "Neuer Laden" and the "Neu…" unit/aisle options (no modal prompt).
+- **Amount of a checked entry**: tapping it opens the amount sheet; saving reopens the entry with the new amount.
+- **Invalid amounts** (empty, unparsable, <= 0, below the unit's step): field marked red, the confirm button is disabled. No silent clamping.
+- **Navigation**: no router; a view state in the store switches between list, shops and catalog.
+- **Tests**: Vitest for store/logic (IndexedDB via `fake-indexeddb`) plus component tests; Playwright E2E for the main flows.
+
 ---
 
 ## 1. Data model
