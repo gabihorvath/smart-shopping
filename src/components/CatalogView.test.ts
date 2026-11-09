@@ -64,7 +64,11 @@ describe('Artikel tab', () => {
     expect(
       w.findAll('[data-testid="catalog-item"]').map((x) => x.attributes('data-name')),
     ).toContain('Äpfel')
-    expect(w.findAll('[data-testid="catalog-item"]').length).toBeLessThan(5)
+    const shown = w.findAll('[data-testid="catalog-item"]').map((x) => x.attributes('data-name'))
+    expect(shown.length).toBeLessThan(15)
+    expect(shown.every((n) => n!.toLowerCase().includes('apfel') || n!.includes('Äpfel'))).toBe(
+      true,
+    )
   })
 
   it('creates an item and shows a duplicate name error inline', async () => {

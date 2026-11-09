@@ -58,6 +58,8 @@ Multi-user, sync, multiple lists, i18n, dark mode, export/share, and any extras 
 
 ## Seed data (proposal, to be edited)
 
+The table below is only a **sample** of the seed: the original core set. The real, extensive seed data (about 800 items in the same units and aisles) lives in `src/domain/seed.ts`. Edit it there, not here.
+
 Units: Stk, g, kg, ml, l, Pkg, Dose, Glas, Flasche, Bund, Beutel.
 
 | Aisle | Items (unit) |
@@ -76,7 +78,7 @@ Units: Stk, g, kg, ml, l, Pkg, Dose, Glas, Flasche, Bund, Beutel.
 
 A default shop is created with all aisles in the order above, so the app is usable on first start.
 
-- The seed set and default shop above are accepted as the starting point.
+- The sample set and default shop above are accepted as the starting point; the full seed in `src/domain/seed.ts` extends the sample.
 - The GitHub repo is public (free plan). Code and seed data are visible, the user's list data stays on the phone.
 
 ## Design
