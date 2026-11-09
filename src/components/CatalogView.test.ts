@@ -174,6 +174,17 @@ describe('Einheiten tab', () => {
     expect(u.step).toBe(0.1)
   })
 
+  it('editing a unit with step 1000 keeps the step (no grouped text)', async () => {
+    const { s, w } = await fresh()
+    await s.updateUnit(s.units.find((u) => u.name === 'kg')!.id, { name: 'kg', step: 1000 })
+    await tab(w, 'units')
+    await w.get('[aria-label="kg bearbeiten"]').trigger('click')
+    await flushPromises()
+    expect((q('[data-testid="unit-step-input"]') as HTMLInputElement).value).toBe('1000')
+    await click(buttonByText('Speichern'))
+    expect(s.units.find((u) => u.name === 'kg')!.step).toBe(1000)
+  })
+
   it('blocked delete shows the count', async () => {
     const { s, w } = await fresh()
     await tab(w, 'units')

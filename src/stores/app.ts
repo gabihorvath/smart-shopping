@@ -15,6 +15,7 @@ export const MSG = {
   itemOnList: 'Artikel ist noch auf der Liste.',
   lastShop: 'Mindestens ein Laden muss bleiben',
   notFound: 'Eintrag nicht gefunden.',
+  itemDeleted: 'Artikel existiert nicht mehr.',
   alreadyOnList: 'Artikel ist schon auf der Liste.',
   unitInUse: (n: number) => `Einheit wird noch von ${n} Artikeln verwendet.`,
   aisleInUse: (n: number) => `Gang wird noch von ${n} Artikeln verwendet.`,
@@ -232,7 +233,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   async function restoreEntry(entry: ListEntry): Promise<Result> {
-    if (!itemById.value.has(entry.itemId)) return fail(MSG.notFound)
+    if (!itemById.value.has(entry.itemId)) return fail(MSG.itemDeleted)
     if (entryByItemId.value.has(entry.itemId) || entryById.value.has(entry.id))
       return fail(MSG.alreadyOnList)
     const e = { ...entry }

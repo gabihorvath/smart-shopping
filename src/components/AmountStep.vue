@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { validateAmount } from '../domain/amount'
 import AmountInput from './ui/AmountInput.vue'
 
 /** Item name / aisle / amount editor with a confirm button. Used by the add flow and the amount sheet. */
@@ -13,13 +14,16 @@ const props = defineProps<{
   confirmLabel: string
   error?: string | null
   showBack?: boolean
+  busy?: boolean
 }>()
 const emit = defineEmits<{ confirm: [amount: number]; back: [] }>()
 
 const value = ref<number | null>(props.initial ?? props.step)
+// An invalid initial value (e.g. below a raised step) is shown red by AmountInput and must not be confirmable.
+const valid = computed(() => value.value !== null && validateAmount(value.value, props.step))
 
 function submit() {
-  if (value.value !== null) emit('confirm', value.value)
+  if (valid.value && !props.busy) emit('confirm', value.value!)
 }
 </script>
 
@@ -42,7 +46,7 @@ function submit() {
       </button>
       <button
         type="button"
-        :disabled="value === null"
+        :disabled="!valid || busy"
         class="min-h-12 flex-1 rounded-xl bg-green-600 font-semibold text-white active:bg-green-700 disabled:bg-gray-300"
         @click="submit"
       >

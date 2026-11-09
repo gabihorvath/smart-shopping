@@ -145,6 +145,16 @@ describe('entries / add rules', () => {
     expect(await s.restoreEntry(removed)).toEqual({ ok: false, error: MSG.alreadyOnList })
   })
 
+  it('restore reports a deleted catalog item clearly', async () => {
+    const s = await fresh()
+    const id = itemNamed(s, 'Milch').id
+    await s.addItem(id, 1)
+    const removed = (await s.removeEntry(s.entries[0]!.id))!
+    expect((await s.deleteItem(id)).ok).toBe(true)
+    expect(await s.restoreEntry(removed)).toEqual({ ok: false, error: MSG.itemDeleted })
+    expect(MSG.itemDeleted).toBe('Artikel existiert nicht mehr.')
+  })
+
   it('listView reflects shop and entries', async () => {
     const s = await fresh()
     await s.addItem(itemNamed(s, 'Milch').id, 1)

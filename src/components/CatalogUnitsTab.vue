@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useDialog } from '../composables/useDialog'
-import { formatAmount, parseAmount } from '../domain/amount'
+import { formatAmount, parseAmount, toInputText } from '../domain/amount'
 import { compareNames } from '../domain/text'
 import type { Unit } from '../domain/types'
 import { MSG, useAppStore } from '../stores/app'
@@ -31,7 +31,7 @@ function openNew() {
 function openEdit(u: Unit) {
   editing.value = u
   name.value = u.name
-  stepText.value = formatAmount(u.step)
+  stepText.value = toInputText(u.step)
   nameError.value = null
   sheetOpen.value = true
 }

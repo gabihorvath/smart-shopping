@@ -10,6 +10,7 @@ const emit = defineEmits<{ close: [] }>()
 
 const store = useAppStore()
 const error = ref<string | null>(null)
+const busy = ref(false)
 
 const info = computed(() => {
   const entry = props.entryId ? store.entryById.get(props.entryId) : undefined
@@ -25,10 +26,15 @@ watch(
 )
 
 async function save(amount: number) {
-  if (!info.value) return
-  const r = await store.setAmount(info.value.entry.id, amount)
-  if (r.ok) emit('close')
-  else error.value = r.error
+  if (busy.value || !info.value) return
+  busy.value = true
+  try {
+    const r = await store.setAmount(info.value.entry.id, amount)
+    if (r.ok) emit('close')
+    else error.value = r.error
+  } finally {
+    busy.value = false
+  }
 }
 </script>
 
@@ -48,6 +54,7 @@ async function save(amount: number) {
       :initial="info.entry.amount"
       confirm-label="Speichern"
       :error="error"
+      :busy="busy"
       @confirm="save"
     />
   </BottomSheet>

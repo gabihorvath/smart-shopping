@@ -22,6 +22,7 @@ const query = ref('')
 const picked = ref<CatalogItem | null>(null)
 const error = ref<string | null>(null)
 const searchEl = ref<HTMLInputElement>()
+const busy = ref(false)
 
 const catalog = computed(() =>
   store.activeShop
@@ -84,22 +85,27 @@ function hint(item: CatalogItem): string | null {
 async function add(amount: number) {
   const item = picked.value
   const info = pickedInfo.value
-  if (!item || !info) return
-  error.value = null
-  const r = await store.addItem(item.id, amount)
-  if (r.status !== 'needsConfirm') {
-    if (r.status === 'invalid') error.value = r.error
-    else reset()
-    return
+  if (busy.value || !item || !info) return
+  busy.value = true
+  try {
+    error.value = null
+    const r = await store.addItem(item.id, amount)
+    if (r.status !== 'needsConfirm') {
+      if (r.status === 'invalid') error.value = r.error
+      else reset()
+      return
+    }
+    const yes = await dialog.confirm(
+      `${item.name} ist schon auf der Liste (aktuell ${formatAmount(r.current)} ${info.unit.name}). Menge addieren?`,
+      { okLabel: 'Ja', cancelLabel: 'Nein' },
+    )
+    if (!yes) return
+    const res = await store.confirmAddAmount(item.id, amount)
+    if (res.ok) reset()
+    else error.value = res.error
+  } finally {
+    busy.value = false
   }
-  const yes = await dialog.confirm(
-    `${item.name} ist schon auf der Liste (aktuell ${formatAmount(r.current)} ${info.unit.name}). Menge addieren?`,
-    { okLabel: 'Ja', cancelLabel: 'Nein' },
-  )
-  if (!yes) return
-  const res = await store.confirmAddAmount(item.id, amount)
-  if (res.ok) reset()
-  else error.value = res.error
 }
 
 function created(item: CatalogItem) {
@@ -190,6 +196,7 @@ function created(item: CatalogItem) {
       :step="pickedInfo.unit.step"
       confirm-label="Hinzufügen"
       :error="error"
+      :busy="busy"
       show-back
       @confirm="add"
       @back="reset"

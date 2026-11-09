@@ -95,6 +95,8 @@ export async function writeBatch(db: Db, batch: WriteBatch): Promise<void> {
     for (const v of part.put ?? []) ops.push(store.put(v))
   }
   if (batch.settings) ops.push(tx.objectStore('settings').put(batch.settings, SETTINGS_KEY))
+  // abort() makes tx.done reject; mark it handled so only the original error propagates
+  tx.done.catch(() => {})
   try {
     await Promise.all(ops)
     await tx.done

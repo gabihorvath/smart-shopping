@@ -20,6 +20,11 @@ export function formatAmount(n: number): string {
   return formatter.format(n)
 }
 
+/** Decimal comma, no thousands separator, so parseAmount reads it back unchanged. */
+export function toInputText(n: number): string {
+  return String(n).replace('.', ',')
+}
+
 /** Valid iff finite, > 0 and >= step. */
 export function validateAmount(n: number, step: number): boolean {
   return Number.isFinite(n) && n > 0 && n >= step
