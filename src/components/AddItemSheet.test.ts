@@ -26,7 +26,7 @@ describe('AddItemSheet', () => {
     await flushPromises()
     const milch = s.items.find((i) => i.name === 'Milch')!
     const row = [...document.body.querySelectorAll('button')].find((b) =>
-      b.textContent?.includes('Milch'),
+      b.textContent?.trim().startsWith('Milch'),
     )!
     row.click()
     await flushPromises()

@@ -104,7 +104,11 @@ describe('seed', () => {
     expect(s.aisles.map((a) => a.sortKey)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
     expect(s.aisles[0]!.name).toBe('Obst & Gemüse')
     expect(s.aisles[10]!.name).toBe('Drogerie & Haushalt')
-    expect(s.items).toHaveLength(11 + 3 + 7 + 5 + 3 + 7 + 4 + 4 + 3 + 5 + 6)
+    expect(s.items.length).toBeGreaterThan(500)
+    const lower = s.items.map((i) => i.name.toLowerCase())
+    expect(lower.filter((n, i) => lower.indexOf(n) !== i)).toEqual([]) // names unique
+    for (const a of s.aisles) expect(s.items.some((i) => i.aisleId === a.id)).toBe(true)
+    expect(s.items.slice(0, 3).map((i) => i.name)).toEqual(['Äpfel', 'Bananen', 'Zitronen'])
     expect(s.shop.name).toBe('Standard')
     expect(s.shop.aisleIds).toEqual(s.aisles.map((a) => a.id))
     const unitName = (id: string) => s.units.find((u) => u.id === id)!.name
