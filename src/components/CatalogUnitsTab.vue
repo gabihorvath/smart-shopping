@@ -6,6 +6,7 @@ import { compareNames } from '../domain/text'
 import type { Unit } from '../domain/types'
 import { MSG, useAppStore } from '../stores/app'
 import BottomSheet from './ui/BottomSheet.vue'
+import PlusIcon from './ui/PlusIcon.vue'
 
 const store = useAppStore()
 const dialog = useDialog()
@@ -101,7 +102,7 @@ const bad = 'border-red-600'
       class="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex size-14 items-center justify-center rounded-full bg-coral-500 text-3xl text-white shadow-fab transition active:scale-95 active:bg-coral-600"
       @click="openNew"
     >
-      +
+      <PlusIcon />
     </button>
 
     <BottomSheet v-model="sheetOpen" :title="editing ? 'Einheit bearbeiten' : 'Neue Einheit'">

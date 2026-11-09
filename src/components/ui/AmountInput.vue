@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { parseAmount, stepDown, stepUp, toInputText, validateAmount } from '../../domain/amount'
+import PlusIcon from './PlusIcon.vue'
 
 const props = defineProps<{
   /** Parsed amount, or null while the text is invalid. */
@@ -49,7 +50,7 @@ function bump(dir: 1 | -1) {
       class="flex size-12 items-center justify-center rounded-xl bg-cream-deep text-2xl font-semibold text-ink active:bg-line"
       @click="bump(-1)"
     >
-      −
+      <PlusIcon minus />
     </button>
     <input
       :value="text"
@@ -74,7 +75,7 @@ function bump(dir: 1 | -1) {
       class="flex size-12 items-center justify-center rounded-xl bg-cream-deep text-2xl font-semibold text-ink active:bg-line"
       @click="bump(1)"
     >
-      +
+      <PlusIcon />
     </button>
   </div>
 </template>
