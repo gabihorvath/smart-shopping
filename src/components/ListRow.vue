@@ -13,6 +13,8 @@ const dx = ref(0)
 const el = ref<HTMLElement>()
 let start: { x: number; y: number } | null = null
 let mode: 'pending' | 'swipe' = 'pending'
+// set once a gesture became a swipe, so the click that may follow it is not a tap
+let swiped = false
 
 const MIN_MOVE = 10
 
@@ -24,6 +26,7 @@ function down(e: PointerEvent) {
   if (checked.value || (e.pointerType === 'mouse' && e.button !== 0)) return
   start = { x: e.clientX, y: e.clientY }
   mode = 'pending'
+  swiped = false
 }
 
 function move(e: PointerEvent) {
@@ -35,6 +38,7 @@ function move(e: PointerEvent) {
     // only clearly horizontal, leftward gestures; everything else stays a scroll/tap
     if (mx < 0 && Math.abs(mx) > Math.abs(my) * 2) {
       mode = 'swipe'
+      swiped = true
       el.value?.setPointerCapture(e.pointerId)
     } else {
       start = null
@@ -50,6 +54,14 @@ function end(cancelled: boolean) {
   mode = 'pending'
   dx.value = 0
   if (trigger) emit('remove')
+}
+
+function tapName() {
+  if (swiped) {
+    swiped = false
+    return
+  }
+  emit('toggle')
 }
 </script>
 
@@ -87,7 +99,9 @@ function end(cancelled: boolean) {
       </button>
       <span
         class="min-w-0 flex-1 truncate text-base"
+        data-testid="row-name"
         :class="checked ? 'text-gray-500 line-through' : 'text-gray-900'"
+        @click="tapName"
         >{{ row.item.name }}</span
       >
       <button

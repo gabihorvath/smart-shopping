@@ -72,4 +72,42 @@ describe('ListScreen', () => {
     expect(w.get('[data-testid="done"]').text()).toContain('Erledigt (1)')
     expect(s.entries[0]!.checked).toBe(true)
   })
+
+  it('tapping the item name toggles open and checked rows, not the amount button', async () => {
+    const { s, pinia } = await fresh()
+    await s.addItem(idOf(s, 'Brot'), 1)
+    const w = mount(ListScreen, { global: { plugins: [pinia] } })
+    await w.get('[data-testid="amount-btn"]').trigger('click')
+    expect(s.entries[0]!.checked).toBe(false)
+    await w.get('[data-testid="row-name"]').trigger('click')
+    await flushPromises()
+    expect(s.entries[0]!.checked).toBe(true)
+    await w.get('[data-testid="done"] button[aria-expanded]').trigger('click')
+    await w.get('[data-testid="row-name"]').trigger('click')
+    await flushPromises()
+    expect(s.entries[0]!.checked).toBe(false)
+  })
+
+  it('a click right after a swipe gesture does not toggle', async () => {
+    const { s, pinia } = await fresh()
+    await s.addItem(idOf(s, 'Brot'), 1)
+    const w = mount(ListScreen, { global: { plugins: [pinia] }, attachTo: document.body })
+    const el = w.get('[data-testid="list-row"] > div.relative')
+    el.element.setPointerCapture = () => {}
+    Object.defineProperty(el.element, 'offsetWidth', { value: 1000 }) // threshold 110px
+    const ev = (type: string, x: number) =>
+      el.element.dispatchEvent(
+        Object.assign(new Event(type, { bubbles: true }), { clientX: x, clientY: 0, pointerId: 1 }),
+      )
+    ev('pointerdown', 200)
+    ev('pointermove', 150) // dx -50: swipe starts but stays below the remove threshold
+    ev('pointerup', 150)
+    await w.get('[data-testid="row-name"]').trigger('click')
+    await flushPromises()
+    expect(s.entries[0]!.checked).toBe(false)
+    await w.get('[data-testid="row-name"]').trigger('click') // a genuine tap afterwards
+    await flushPromises()
+    expect(s.entries[0]!.checked).toBe(true)
+    w.unmount()
+  })
 })
