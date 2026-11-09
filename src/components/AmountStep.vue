@@ -29,8 +29,8 @@ function submit() {
 
 <template>
   <div class="pt-1 pb-2">
-    <p class="text-sm text-gray-500">{{ aisleName }}</p>
-    <p class="text-xl font-semibold text-gray-900">{{ name }}</p>
+    <p class="text-sm font-medium text-ink-muted">{{ aisleName }}</p>
+    <p class="text-2xl font-bold tracking-tight text-ink">{{ name }}</p>
     <div class="mt-5">
       <AmountInput v-model="value" :unit-name="unitName" :step="step" />
     </div>
@@ -39,15 +39,16 @@ function submit() {
       <button
         v-if="showBack"
         type="button"
-        class="min-h-12 rounded-xl px-4 font-medium text-gray-700 active:bg-gray-100"
+        class="min-h-12 rounded-xl bg-cream-deep px-4 font-semibold text-ink active:bg-line"
         @click="emit('back')"
       >
         Zurück
       </button>
       <button
         type="button"
+        data-testid="confirm-btn"
         :disabled="!valid || busy"
-        class="min-h-12 flex-1 rounded-xl bg-green-600 font-semibold text-white active:bg-green-700 disabled:bg-gray-300"
+        class="min-h-12 flex-1 rounded-xl bg-coral-500 font-semibold text-white active:bg-coral-600 disabled:bg-cream-deep disabled:text-ink-muted"
         @click="submit"
       >
         {{ confirmLabel }}

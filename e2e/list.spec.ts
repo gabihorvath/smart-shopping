@@ -4,7 +4,7 @@ import { addItem, closeSheet, openAddSheet, openApp, pickItem, row } from './hel
 test('first start shows the seeded shop with an empty list', async ({ page }) => {
   await openApp(page)
   await expect(page.getByTestId('shop-selector')).toContainText('Standard')
-  await expect(page.getByText('Die Liste ist leer')).toBeVisible()
+  await expect(page.getByText('Deine Liste ist leer')).toBeVisible()
 })
 
 test('add via search with amount shows the item under its aisle', async ({ page }) => {
@@ -31,7 +31,7 @@ test('invalid amount is marked and blocks adding', async ({ page }) => {
   const input = page.getByTestId('amount-input')
   await expect(input).toHaveValue('0,5')
   await input.fill('0,2')
-  await expect(input).toHaveClass(/border-red-500/)
+  await expect(input).toHaveClass(/border-red-600/)
   await expect(page.getByRole('button', { name: 'Hinzufügen', exact: true })).toBeDisabled()
   await page.getByRole('button', { name: 'Mehr' }).click()
   await expect(input).toHaveValue('1')
@@ -95,7 +95,7 @@ test('remove via x, then undo restores the item', async ({ page }) => {
   await closeSheet(page)
   await page.getByRole('button', { name: 'Brot entfernen' }).click()
   await expect(row(page, 'Brot')).toHaveCount(0)
-  const snack = page.getByTestId('snackbar')
+  const snack = page.getByTestId('snackbar').filter({ hasText: 'entfernt' })
   await expect(snack).toContainText('„Brot“ entfernt')
   await snack.getByRole('button', { name: 'Rückgängig' }).click()
   await expect(row(page, 'Brot')).toBeVisible()
@@ -109,9 +109,10 @@ test('two quick removals show two snackbars; each expires on its own', async ({ 
   await closeSheet(page)
   await page.getByRole('button', { name: 'Brot entfernen' }).click()
   await page.getByRole('button', { name: 'Butter entfernen' }).click()
-  await expect(page.getByTestId('snackbar')).toHaveCount(2)
+  const removed = page.getByTestId('snackbar').filter({ hasText: 'entfernt' })
+  await expect(removed).toHaveCount(2)
   await expect(page.getByTestId('snackbar')).toHaveCount(0, { timeout: 8000 })
-  await expect(page.getByText('Die Liste ist leer')).toBeVisible()
+  await expect(page.getByText('Deine Liste ist leer')).toBeVisible()
 })
 
 test('swipe left removes an open row; vertical movement does not', async ({ page }) => {
@@ -135,7 +136,9 @@ test('swipe left removes an open row; vertical movement does not', async ({ page
   await page.mouse.up()
   await expect(brot).toHaveCount(0)
   await expect(row(page, 'Butter')).toBeVisible()
-  await expect(page.getByTestId('snackbar')).toContainText('„Brot“ entfernt')
+  await expect(page.getByTestId('snackbar').filter({ hasText: 'entfernt' })).toContainText(
+    '„Brot“ entfernt',
+  )
 })
 
 test('Erledigt entfernen asks for confirmation', async ({ page }) => {
@@ -153,15 +156,15 @@ test('Erledigt entfernen asks for confirmation', async ({ page }) => {
   await expect(done).toContainText('Erledigt (2)')
   await done.getByRole('button', { name: 'Entfernen' }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Entfernen' }).click()
-  await expect(page.getByText('Die Liste ist leer')).toBeVisible()
+  await expect(page.getByText('Deine Liste ist leer')).toBeVisible()
 })
 
 test('new item with a new aisle lands in "Nicht in diesem Laden"', async ({ page }) => {
   await openApp(page)
   await openAddSheet(page)
-  await page.getByTestId('search').fill('Zimt')
+  await page.getByTestId('search').fill('Testzimt')
   await page.getByTestId('create-new').click()
-  await expect(page.getByTestId('new-item-name')).toHaveValue('Zimt')
+  await expect(page.getByTestId('new-item-name')).toHaveValue('Testzimt')
   await page.getByTestId('new-item-aisle').selectOption({ label: 'Neu…' })
   await page.getByTestId('new-aisle-name').fill('Backzutaten')
   await page.getByRole('button', { name: 'Anlegen' }).click()
@@ -170,13 +173,13 @@ test('new item with a new aisle lands in "Nicht in diesem Laden"', async ({ page
   const section = page.getByTestId('not-in-shop')
   await expect(section).toContainText('Nicht in diesem Laden')
   await expect(section).toContainText('Backzutaten')
-  await expect(section.locator('[data-name="Zimt"]')).toContainText('1 Stk')
+  await expect(section.locator('[data-name="Testzimt"]')).toContainText('1 Stk')
 })
 
 test('new item with a new unit; duplicate name shows an inline error', async ({ page }) => {
   await openApp(page)
   await openAddSheet(page)
-  await page.getByTestId('search').fill('Fenchel')
+  await page.getByTestId('search').fill('Fenchelmuster')
   await page.getByTestId('create-new').click()
   await page.getByTestId('new-item-unit').selectOption({ label: 'Neu…' })
   await page.getByTestId('new-unit-name').fill('Knolle')
@@ -186,7 +189,7 @@ test('new item with a new unit; duplicate name shows an inline error', async ({ 
   await page.getByRole('button', { name: 'Hinzufügen', exact: true }).click()
   await expect(page.getByTestId('search')).toHaveValue('')
   // creating a unit that exists must show the store error
-  await page.getByTestId('search').fill('Fenchelsamen')
+  await page.getByTestId('search').fill('Fenchelmustersamen')
   await page.getByTestId('create-new').click()
   await page.getByTestId('new-item-unit').selectOption({ label: 'Neu…' })
   await page.getByTestId('new-unit-name').fill('knolle')

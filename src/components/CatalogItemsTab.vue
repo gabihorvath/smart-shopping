@@ -38,7 +38,7 @@ async function remove() {
 
 <template>
   <div>
-    <div class="px-4 py-2">
+    <div class="px-4 pt-1 pb-2">
       <input
         v-model="query"
         type="search"
@@ -46,15 +46,15 @@ async function remove() {
         aria-label="Suche"
         data-testid="catalog-search"
         autocomplete="off"
-        class="h-12 w-full rounded-xl border-2 border-gray-300 px-3 text-base outline-none focus:border-green-600"
+        class="h-12 w-full rounded-xl border-2 border-line bg-card px-4 text-base text-ink outline-none placeholder:text-ink-muted focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
       />
     </div>
-    <p v-if="!groups.length" class="px-4 py-8 text-center text-gray-500">Keine Artikel</p>
+    <p v-if="!groups.length" class="px-4 py-8 text-center text-ink-muted">Keine Artikel</p>
     <section v-for="g in groups" :key="g.aisle.id" data-testid="catalog-group">
-      <h2 class="bg-gray-100 px-4 py-1 text-xs font-semibold tracking-wide text-gray-600 uppercase">
+      <h2 class="px-5 pt-4 pb-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
         {{ g.aisle.name }}
       </h2>
-      <ul>
+      <ul class="mx-4 divide-y divide-line overflow-hidden rounded-2xl bg-card shadow-card">
         <li
           v-for="i in g.items"
           :key="i.id"
@@ -62,14 +62,14 @@ async function remove() {
           :data-name="i.name"
           class="flex min-h-12 items-center pl-4"
         >
-          <span class="min-w-0 flex-1 truncate text-base text-gray-900">{{ i.name }}</span>
-          <span class="shrink-0 pl-2 text-sm text-gray-500">{{
+          <span class="min-w-0 flex-1 truncate text-base text-ink">{{ i.name }}</span>
+          <span class="shrink-0 pl-2 text-sm text-ink-muted">{{
             store.unitById.get(i.unitId)?.name
           }}</span>
           <button
             type="button"
             :aria-label="`${i.name} bearbeiten`"
-            class="flex size-11 shrink-0 items-center justify-center text-gray-600 active:bg-gray-100"
+            class="flex size-11 shrink-0 items-center justify-center text-ink-muted active:bg-cream-deep"
             @click="openEdit(i)"
           >
             ✎
@@ -82,7 +82,7 @@ async function remove() {
       type="button"
       aria-label="Artikel anlegen"
       data-testid="fab"
-      class="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex size-14 items-center justify-center rounded-full bg-green-600 text-3xl text-white shadow-lg active:bg-green-700"
+      class="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex size-14 items-center justify-center rounded-full bg-coral-500 text-3xl text-white shadow-fab transition active:scale-95 active:bg-coral-600"
       @click="openNew"
     >
       +

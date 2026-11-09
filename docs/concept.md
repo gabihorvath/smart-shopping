@@ -24,12 +24,15 @@ A private, single-user web app for exactly one shopping list, used mainly on a p
 - If the item is already on the list, ask "Add to the existing amount?"
   - Yes: the amounts are added together.
   - No: cancel the add.
+- After a successful add, a short snackbar confirms it ("„X“ ist auf der Liste ✓"); the add sheet stays open for the next item.
 
 ### List view (for the active shop)
 Sections, from top to bottom:
 1. **Open items**, grouped by aisle in the active shop's aisle order, items alphabetical within an aisle.
 2. **Aisles not in this shop**: open items whose aisle the shop skips. Shown dimmed in their own section, grouped by aisle, with full check/remove actions.
 3. **Done**: checked items, dimmed, foldable, grouped by aisle in the active shop's order.
+
+If the list is empty, a friendly empty state is shown ("Deine Liste ist leer"). If everything is checked off, "Alles erledigt! 🎉" is shown above the Done section.
 
 ### Item actions
 - **Check**: marks the item done, dimmed, and moves it to the Done section. Can be undone (restore).

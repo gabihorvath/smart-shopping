@@ -15,36 +15,36 @@ const store = useAppStore()
     :shop-id="store.editingShopId"
     @back="store.closeEditor()"
   />
-  <div v-else class="min-h-dvh bg-white pb-[max(1rem,env(safe-area-inset-bottom))]">
+  <div v-else class="min-h-dvh bg-cream pb-[max(1rem,env(safe-area-inset-bottom))]">
     <header
-      class="sticky top-0 z-20 flex items-center gap-1 bg-green-600 px-2 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 text-white"
+      class="sticky top-0 z-20 flex items-center gap-3 bg-cream/90 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-3 text-ink backdrop-blur"
     >
       <button
         type="button"
         aria-label="Zurück"
-        class="flex size-11 items-center justify-center rounded-lg text-2xl active:bg-green-700"
+        class="flex size-11 items-center justify-center rounded-full bg-card text-2xl text-ink shadow-card active:bg-cream-deep"
         @click="store.setView('list')"
       >
         ‹
       </button>
-      <h1 class="text-lg font-semibold">Läden</h1>
+      <h1 class="text-2xl font-bold tracking-tight">Läden</h1>
     </header>
-    <ul class="px-2 py-1">
+    <ul class="mx-4 divide-y divide-line overflow-hidden rounded-2xl bg-card shadow-card">
       <li v-for="s in store.shops" :key="s.id">
         <button
           type="button"
           data-testid="shop-row"
-          class="flex min-h-12 w-full items-center justify-between gap-2 rounded-lg px-2 text-left active:bg-gray-100"
+          class="flex min-h-12 w-full items-center justify-between gap-2 px-4 text-left active:bg-cream-deep"
           @click="store.editShop(s.id)"
         >
-          <span class="truncate text-base text-gray-900">{{ s.name }}</span>
-          <span class="shrink-0 text-sm text-gray-500">
+          <span class="truncate text-base font-medium text-ink">{{ s.name }}</span>
+          <span class="shrink-0 text-sm text-ink-muted">
             {{ s.id === store.activeShopId ? 'aktiv ›' : '›' }}
           </span>
         </button>
       </li>
     </ul>
-    <div class="px-2">
+    <div class="mx-4 mt-3">
       <NewShopInline @created="store.editShop($event.id)" />
     </div>
   </div>

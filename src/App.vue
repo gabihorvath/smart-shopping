@@ -12,7 +12,10 @@ onMounted(() => store.init())
 </script>
 
 <template>
-  <div v-if="!store.ready" class="flex min-h-dvh items-center justify-center text-gray-500">
+  <div
+    v-if="!store.ready"
+    class="flex min-h-dvh items-center justify-center bg-cream text-ink-muted"
+  >
     Lade…
   </div>
   <template v-else>

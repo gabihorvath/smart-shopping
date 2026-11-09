@@ -69,14 +69,14 @@ function tapName() {
   <li class="relative overflow-hidden" data-testid="list-row" :data-name="row.item.name">
     <div
       v-if="dx < 0"
-      class="absolute inset-y-0 right-0 flex items-center bg-red-500 px-5 text-sm font-medium text-white"
+      class="absolute inset-y-0 right-0 flex items-center bg-red-600 px-5 text-sm font-semibold text-white"
       :style="{ width: `${-dx}px` }"
     >
       Entfernen
     </div>
     <div
       ref="el"
-      class="relative flex min-h-12 touch-pan-y items-center gap-1 bg-white select-none"
+      class="relative flex min-h-14 touch-pan-y items-center gap-1 bg-card pl-1 select-none"
       :class="[dx === 0 ? 'transition-transform' : '', highlight ? 'row-flash' : '']"
       :style="{ transform: dx ? `translateX(${dx}px)` : undefined }"
       @pointerdown="down"
@@ -91,8 +91,8 @@ function tapName() {
         @click="emit('toggle')"
       >
         <span
-          class="flex size-6 items-center justify-center rounded-full border-2 text-xs text-white"
-          :class="checked ? 'border-green-600 bg-green-600' : 'border-gray-400'"
+          class="flex size-7 items-center justify-center rounded-full border-2 text-sm font-bold text-white transition"
+          :class="checked ? 'border-coral-500 bg-coral-500' : 'border-coral-500/60'"
         >
           <template v-if="checked">✓</template>
         </span>
@@ -100,23 +100,26 @@ function tapName() {
       <span
         class="min-w-0 flex-1 truncate text-base"
         data-testid="row-name"
-        :class="checked ? 'text-gray-500 line-through' : 'text-gray-900'"
+        :class="checked ? 'text-ink-muted line-through' : 'font-medium text-ink'"
         @click="tapName"
         >{{ row.item.name }}</span
       >
       <button
         type="button"
         data-testid="amount-btn"
-        class="min-h-11 shrink-0 rounded-lg px-2 text-base text-gray-700 active:bg-gray-100"
+        class="group flex min-h-11 shrink-0 items-center px-1"
         :aria-label="`Menge ändern: ${row.item.name}`"
         @click="emit('amount')"
       >
-        {{ formatAmount(row.entry.amount) }} {{ row.unit.name }}
+        <span
+          class="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700 group-active:bg-blue-100"
+          >{{ formatAmount(row.entry.amount) }} {{ row.unit.name }}</span
+        >
       </button>
       <button
         v-if="!checked"
         type="button"
-        class="flex size-11 shrink-0 items-center justify-center text-xl text-gray-400 active:text-red-600"
+        class="flex size-11 shrink-0 items-center justify-center text-xl text-ink-muted active:text-red-600"
         :aria-label="`${row.item.name} entfernen`"
         @click="emit('remove')"
       >

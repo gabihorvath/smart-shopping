@@ -7,11 +7,11 @@ const emit = defineEmits<{ toggle: [row: Row]; amount: [row: Row]; remove: [row:
 </script>
 
 <template>
-  <section v-for="g in groups" :key="g.aisle.id" data-testid="aisle-group">
-    <h3 class="px-4 pt-3 pb-1 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+  <section v-for="g in groups" :key="g.aisle.id" class="mb-4" data-testid="aisle-group">
+    <h3 class="px-8 pt-1 pb-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
       {{ g.aisle.name }}
     </h3>
-    <ul class="px-2">
+    <ul class="mx-4 divide-y divide-line overflow-hidden rounded-2xl bg-card shadow-card">
       <ListRow
         v-for="r in g.rows"
         :key="r.entry.id"

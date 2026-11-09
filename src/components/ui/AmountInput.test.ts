@@ -19,7 +19,7 @@ describe('AmountInput', () => {
     const w = make(0.5)
     await w.get('input').setValue('2,25')
     expect(last(w)).toBe(2.25)
-    expect(w.get('input').classes()).not.toContain('border-red-500')
+    expect(w.get('input').classes()).not.toContain('border-red-600')
   })
 
   it('marks invalid input red and emits null', async () => {
@@ -27,7 +27,7 @@ describe('AmountInput', () => {
     for (const bad of ['', 'abc', '0', '-1', '0,3']) {
       await w.get('input').setValue(bad)
       expect(last(w)).toBeNull()
-      expect(w.get('input').classes()).toContain('border-red-500')
+      expect(w.get('input').classes()).toContain('border-red-600')
     }
   })
 

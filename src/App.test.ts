@@ -14,5 +14,5 @@ it('shows loading, then the list for the seeded default shop', async () => {
   expect(w.text()).toContain('Lade')
   await vi.waitFor(() => expect(w.text()).not.toContain('Lade'))
   expect(w.text()).toContain('Standard')
-  expect(w.text()).toContain('Die Liste ist leer')
+  expect(w.text()).toContain('Deine Liste ist leer')
 })

@@ -15,22 +15,22 @@ const tabs: { id: CatalogTab; label: string }[] = [
 </script>
 
 <template>
-  <div class="flex min-h-dvh flex-col bg-white">
+  <div class="flex min-h-dvh flex-col bg-cream">
     <header
-      class="sticky top-0 z-20 bg-green-600 px-2 pt-[max(0.5rem,env(safe-area-inset-top))] text-white"
+      class="sticky top-0 z-20 bg-cream/90 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-3 text-ink backdrop-blur"
     >
-      <div class="flex items-center gap-1 pb-1">
+      <div class="flex items-center gap-3 pb-3">
         <button
           type="button"
           aria-label="Zurück"
-          class="flex size-11 shrink-0 items-center justify-center rounded-lg text-2xl active:bg-green-700"
+          class="flex size-11 shrink-0 items-center justify-center rounded-full bg-card text-2xl text-ink shadow-card active:bg-cream-deep"
           @click="store.setView('list')"
         >
           ‹
         </button>
-        <h1 class="text-lg font-semibold">Katalog</h1>
+        <h1 class="text-2xl font-bold tracking-tight">Katalog</h1>
       </div>
-      <div role="tablist" class="flex">
+      <div role="tablist" class="flex gap-1 rounded-full bg-cream-deep p-1">
         <button
           v-for="t in tabs"
           :key="t.id"
@@ -38,8 +38,8 @@ const tabs: { id: CatalogTab; label: string }[] = [
           role="tab"
           :aria-selected="catalogTab === t.id"
           :data-testid="`tab-${t.id}`"
-          class="min-h-11 flex-1 border-b-4 font-medium"
-          :class="catalogTab === t.id ? 'border-white' : 'border-transparent text-green-100'"
+          class="min-h-11 flex-1 rounded-full font-semibold transition"
+          :class="catalogTab === t.id ? 'bg-card text-coral-700 shadow-card' : 'text-ink-muted'"
           @click="catalogTab = t.id"
         >
           {{ t.label }}

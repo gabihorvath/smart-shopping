@@ -33,32 +33,38 @@ async function submit() {
       v-if="!open"
       type="button"
       data-testid="new-shop"
-      class="flex min-h-12 w-full items-center rounded-lg px-2 text-left font-medium text-green-700 active:bg-gray-100"
+      class="flex min-h-12 w-full items-center rounded-xl bg-coral-50 px-4 text-left font-semibold text-coral-700 active:bg-coral-100"
       @click="show"
     >
       + Neuer Laden
     </button>
-    <form v-else class="flex flex-col gap-2 px-2" @submit.prevent="submit">
-      <label class="text-sm text-gray-600" for="new-shop-name">Name des neuen Ladens</label>
+    <form v-else class="flex flex-col gap-2" @submit.prevent="submit">
+      <label class="text-sm font-medium text-ink-muted" for="new-shop-name"
+        >Name des neuen Ladens</label
+      >
       <div class="flex gap-2">
         <input
           id="new-shop-name"
           v-model="name"
           data-testid="new-shop-name"
           autocomplete="off"
-          class="min-h-11 min-w-0 flex-1 rounded-lg border px-3 text-base"
-          :class="error ? 'border-red-500' : 'border-gray-300'"
+          class="h-12 min-w-0 flex-1 rounded-xl border-2 bg-card px-3 text-base text-ink outline-none"
+          :class="
+            error
+              ? 'border-red-600'
+              : 'border-line focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15'
+          "
           @input="error = null"
         />
         <button
           type="submit"
-          class="min-h-11 rounded-lg bg-green-600 px-4 font-medium text-white active:bg-green-700"
+          class="min-h-12 rounded-xl bg-coral-500 px-4 font-semibold text-white active:bg-coral-600"
         >
           Anlegen
         </button>
         <button
           type="button"
-          class="min-h-11 rounded-lg px-3 text-gray-700 active:bg-gray-100"
+          class="min-h-12 rounded-xl bg-cream-deep px-3 font-semibold text-ink active:bg-line"
           @click="open = false"
         >
           Abbrechen

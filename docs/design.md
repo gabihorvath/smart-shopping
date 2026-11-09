@@ -113,7 +113,7 @@ For each entry, resolve `item = items[entry.itemId]` and `aisle = aisles[item.ai
    - Grouped by aisle in `S.aisleIds` order; aisles not in `S` come after, by `sortKey`.
    - Within a group: item name ascending.
 
-Empty sections and empty groups are not rendered. If everything is empty, show "Die Liste ist leer".
+Empty sections and empty groups are not rendered. If everything is empty (no open, not-in-shop or done entries), show an empty state: headline "Deine Liste ist leer", subline "Tippe auf +, um loszulegen.". If there are no open rows (neither in-shop nor not-in-shop) but at least one done entry, show "Alles erledigt! 🎉" with the subline "Super gemacht." above the collapsed Done section.
 
 Changing the active shop recomputes the view only. Entries are never changed by it.
 
@@ -126,6 +126,7 @@ Changing the active shop recomputes the view only. Entries are never changed by 
   - no entry for `X`: create `{ itemId: X, amount: a, checked: false }`.
   - open entry exists: ask **"X ist schon auf der Liste (aktuell 2 kg). Menge addieren?"** Yes: `amount += a`. No: cancel, the sheet stays open so the user can correct the amount.
   - checked entry exists: no question. Reopen it: `checked = false`, `checkedAt = null`, `amount = a` (replaces the old amount).
+- After a successful add (direct or confirmed), a snackbar without action shows `„X“ ist auf der Liste ✓`. The sheet resets to the search step and stays open.
 
 ### Check / remove / clear
 - Check: `checked = true`, `checkedAt = now`. Undo: tap again in Done (`checked = false`), amount is kept.
@@ -270,3 +271,21 @@ Menu -> "Katalog": three tabs at the top: **Artikel | Einheiten | Gänge**.
 - **Einheiten**: list of units with their step value. "+": name + step. ✎: edit name/step, "Löschen" (blocked if in use, with the count).
 - **Gänge**: list in global order with the item count. "+": name. ✎: rename, "Löschen" (blocked if in use). The global order (`sortKey`) is changed by drag handle here; this affects only the "Nicht in diesem Laden" section and the catalog view, not any shop's own order.
 - Blocked deletion shows a message dialog with the reason (section 3), no state change.
+
+---
+
+## 5. Visual style
+
+Light mode only: soft cream page, white rounded cards with subtle shadows, coral as the primary accent, electric blue for highlights. Font: Plus Jakarta Sans (variable, latin subset, bundled via `@fontsource-variable/plus-jakarta-sans` and precached for offline use). All tokens live in `src/style.css` (`@theme`); components use the generated utilities and no hard-coded hex values.
+
+| Token | Value | Use |
+|---|---|---|
+| `cream` / `cream-deep` | `#FFF8F0` / `#F7EDE1` | page background, tracks, pressed states, secondary buttons |
+| `card` | `#FFFFFF` | cards, sheets, inputs |
+| `ink` / `ink-muted` / `line` | `#2B2420` / `#8A7F76` / `#F0E6DA` | text, secondary text, dividers and borders |
+| `coral-50/100/500/600/700` | `#FFF1EE` `#FFE0D9` `#FF6F5E` `#F0533F` `#C73E2E` | 500 fills (FAB, primary buttons, checked checkbox), 600 pressed, 700 coral text, 50/100 soft backgrounds |
+| `blue-50/100/500/600/700` | `#EAF0FF` `#D6E2FF` `#2F6BFF` `#1F55E0` `#1A47BD` | amount chips, selection states, focus rings, row flash |
+| red 600/700 (Tailwind) | | destructive actions, swipe-remove background, validation errors |
+| `shadow-card` / `shadow-fab` / `shadow-sheet` | soft warm shadows | cards, FAB, sheets and menus |
+
+Shapes: cards `rounded-2xl`, buttons and inputs `rounded-xl`, sheets `rounded-t-3xl`, dialogs `rounded-3xl`, chips and FAB `rounded-full`. Headings are bold with slight negative tracking; aisle labels are small, uppercase, wide-tracked and `ink-muted`. Inputs: white with a 2 px `line` border, blue border and ring on focus, red when invalid. Primary buttons: coral fill, white text, disabled `cream-deep` with muted text. Snackbars stay dark (`ink`). The theme colour and manifest colours are the cream `#FFF8F0`; the app icon is a white cart on coral.
