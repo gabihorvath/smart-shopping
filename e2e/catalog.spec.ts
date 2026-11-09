@@ -57,15 +57,15 @@ const aisleNames = (page: Page) =>
 test('add an item in the catalog and find it in the add flow', async ({ page }) => {
   await openApp(page)
   await openCatalog(page)
-  await createItem(page, 'Zimtstangen', 'Pkg', 'Gewürze & Öle')
-  await expect(page.locator('[data-testid="catalog-item"][data-name="Zimtstangen"]')).toBeVisible()
+  await createItem(page, 'Zimtmuster', 'Pkg', 'Gewürze & Öle')
+  await expect(page.locator('[data-testid="catalog-item"][data-name="Zimtmuster"]')).toBeVisible()
   await backToList(page)
   await page.getByTestId('fab').click()
-  await pickItem(page, 'Zimtstangen')
+  await pickItem(page, 'Zimtmuster')
   await page.getByRole('button', { name: 'Hinzufügen', exact: true }).click()
   await closeSheet(page)
   const group = page.getByTestId('aisle-group').filter({ hasText: 'Gewürze & Öle' })
-  await expect(group.locator('[data-name="Zimtstangen"]')).toContainText('1 Pkg')
+  await expect(group.locator('[data-name="Zimtmuster"]')).toContainText('1 Pkg')
 })
 
 test('search filters the catalog (umlauts and case ignored)', async ({ page }) => {

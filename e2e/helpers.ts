@@ -16,8 +16,8 @@ export async function pickItem(page: Page, name: string) {
   await page.getByTestId('search').fill(name)
   await page
     .getByRole('dialog')
-    .getByRole('button', { name: new RegExp(`^${name}`) })
-    .first()
+    .getByRole('button')
+    .filter({ has: page.getByText(name, { exact: true }) })
     .click()
 }
 

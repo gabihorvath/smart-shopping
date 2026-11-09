@@ -136,7 +136,9 @@ test('swipe left removes an open row; vertical movement does not', async ({ page
   await page.mouse.up()
   await expect(brot).toHaveCount(0)
   await expect(row(page, 'Butter')).toBeVisible()
-  await expect(page.getByTestId('snackbar')).toContainText('„Brot“ entfernt')
+  await expect(page.getByTestId('snackbar').filter({ hasText: 'entfernt' })).toContainText(
+    '„Brot“ entfernt',
+  )
 })
 
 test('Erledigt entfernen asks for confirmation', async ({ page }) => {
@@ -160,9 +162,9 @@ test('Erledigt entfernen asks for confirmation', async ({ page }) => {
 test('new item with a new aisle lands in "Nicht in diesem Laden"', async ({ page }) => {
   await openApp(page)
   await openAddSheet(page)
-  await page.getByTestId('search').fill('Zimt')
+  await page.getByTestId('search').fill('Testzimt')
   await page.getByTestId('create-new').click()
-  await expect(page.getByTestId('new-item-name')).toHaveValue('Zimt')
+  await expect(page.getByTestId('new-item-name')).toHaveValue('Testzimt')
   await page.getByTestId('new-item-aisle').selectOption({ label: 'Neu…' })
   await page.getByTestId('new-aisle-name').fill('Backzutaten')
   await page.getByRole('button', { name: 'Anlegen' }).click()
@@ -171,13 +173,13 @@ test('new item with a new aisle lands in "Nicht in diesem Laden"', async ({ page
   const section = page.getByTestId('not-in-shop')
   await expect(section).toContainText('Nicht in diesem Laden')
   await expect(section).toContainText('Backzutaten')
-  await expect(section.locator('[data-name="Zimt"]')).toContainText('1 Stk')
+  await expect(section.locator('[data-name="Testzimt"]')).toContainText('1 Stk')
 })
 
 test('new item with a new unit; duplicate name shows an inline error', async ({ page }) => {
   await openApp(page)
   await openAddSheet(page)
-  await page.getByTestId('search').fill('Fenchel')
+  await page.getByTestId('search').fill('Fenchelmuster')
   await page.getByTestId('create-new').click()
   await page.getByTestId('new-item-unit').selectOption({ label: 'Neu…' })
   await page.getByTestId('new-unit-name').fill('Knolle')
@@ -187,7 +189,7 @@ test('new item with a new unit; duplicate name shows an inline error', async ({ 
   await page.getByRole('button', { name: 'Hinzufügen', exact: true }).click()
   await expect(page.getByTestId('search')).toHaveValue('')
   // creating a unit that exists must show the store error
-  await page.getByTestId('search').fill('Fenchelsamen')
+  await page.getByTestId('search').fill('Fenchelmustersamen')
   await page.getByTestId('create-new').click()
   await page.getByTestId('new-item-unit').selectOption({ label: 'Neu…' })
   await page.getByTestId('new-unit-name').fill('knolle')
