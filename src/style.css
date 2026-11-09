@@ -1,1 +1,30 @@
 @import 'tailwindcss';
+
+html,
+body {
+  background: #fff;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sheet-panel {
+  animation: sheet-up 0.18s ease-out;
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
+
+.row-flash {
+  animation: row-flash 1.5s ease-out;
+}
+
+@keyframes row-flash {
+  0%,
+  40% {
+    background-color: #bbf7d0;
+  }
+}

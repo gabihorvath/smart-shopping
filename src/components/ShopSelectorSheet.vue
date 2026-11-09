@@ -1,0 +1,46 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useAppStore } from '../stores/app'
+import BottomSheet from './ui/BottomSheet.vue'
+
+defineProps<{ modelValue: boolean }>()
+const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
+
+const store = useAppStore()
+const error = ref<string | null>(null)
+
+async function choose(id: string) {
+  const r = await store.setActiveShop(id)
+  if (r.ok) emit('update:modelValue', false)
+  else error.value = r.error
+}
+</script>
+
+<template>
+  <BottomSheet
+    :model-value="modelValue"
+    title="Laden wählen"
+    @update:model-value="emit('update:modelValue', $event)"
+  >
+    <ul role="radiogroup" aria-label="Laden" class="py-1">
+      <li v-for="s in store.shops" :key="s.id">
+        <button
+          type="button"
+          role="radio"
+          :aria-checked="s.id === store.activeShopId"
+          class="flex min-h-12 w-full items-center gap-3 rounded-lg px-2 text-left active:bg-gray-100"
+          @click="choose(s.id)"
+        >
+          <span
+            class="flex size-6 shrink-0 items-center justify-center rounded-full border-2"
+            :class="s.id === store.activeShopId ? 'border-green-600' : 'border-gray-400'"
+          >
+            <span v-if="s.id === store.activeShopId" class="size-3 rounded-full bg-green-600" />
+          </span>
+          <span class="truncate text-base text-gray-900">{{ s.name }}</span>
+        </button>
+      </li>
+    </ul>
+    <p v-if="error" class="text-sm text-red-600" role="alert">{{ error }}</p>
+  </BottomSheet>
+</template>

@@ -1,6 +1,35 @@
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import CatalogView from './components/CatalogView.vue'
+import ListScreen from './components/ListScreen.vue'
+import ShopsView from './components/ShopsView.vue'
+import DialogHost from './components/ui/DialogHost.vue'
+import SnackbarHost from './components/ui/SnackbarHost.vue'
+import { useAppStore } from './stores/app'
+
+const store = useAppStore()
+onMounted(() => store.init())
+</script>
+
 <template>
-  <main class="min-h-dvh p-4 pt-[max(1rem,env(safe-area-inset-top))]">
-    <h1 class="text-2xl font-bold text-green-700">Einkaufsliste</h1>
-    <p class="mt-2 text-gray-600">Setup funktioniert.</p>
-  </main>
+  <div v-if="!store.ready" class="flex min-h-dvh items-center justify-center text-gray-500">
+    Lade…
+  </div>
+  <template v-else>
+    <div
+      v-if="store.writeError"
+      role="alert"
+      class="fixed inset-x-0 top-0 z-50 flex items-center justify-between gap-2 bg-amber-100 px-4 py-1 pt-[max(0.25rem,env(safe-area-inset-top))] text-sm text-amber-900"
+    >
+      <span>Speichern fehlgeschlagen: {{ store.writeError }}</span>
+      <button type="button" class="min-h-11 px-2 font-medium" @click="store.writeError = null">
+        Schließen
+      </button>
+    </div>
+    <ShopsView v-if="store.view === 'shops'" />
+    <CatalogView v-else-if="store.view === 'catalog'" />
+    <ListScreen v-else />
+  </template>
+  <DialogHost />
+  <SnackbarHost />
 </template>
