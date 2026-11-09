@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -12,9 +12,21 @@ const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
 const panel = ref<HTMLElement>()
 let previous: HTMLElement | null = null
 
+// Page behind the sheet must not scroll (shared counter: sheets can overlap briefly).
+let locked = false
+function setLock(on: boolean) {
+  if (on === locked) return
+  locked = on
+  const w = window as unknown as { __sheetLocks?: number }
+  w.__sheetLocks = Math.max(0, (w.__sheetLocks ?? 0) + (on ? 1 : -1))
+  document.documentElement.style.overflow = w.__sheetLocks > 0 ? 'hidden' : ''
+}
+onBeforeUnmount(() => setLock(false))
+
 watch(
   () => props.modelValue,
   async (open) => {
+    setLock(open)
     if (open) {
       previous = document.activeElement as HTMLElement | null
       await nextTick()

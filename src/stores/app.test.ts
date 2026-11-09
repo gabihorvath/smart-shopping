@@ -385,3 +385,31 @@ describe('persistence round-trip', () => {
     db.close()
   })
 })
+
+describe('shop editor navigation', () => {
+  it('back returns to where the editor was opened from', async () => {
+    const s = await fresh()
+    const id = s.shops[0]!.id
+    s.editShop(id, 'list')
+    expect(s.view).toBe('shops')
+    s.closeEditor()
+    expect(s.view).toBe('list')
+    expect(s.editingShopId).toBeNull()
+
+    s.setView('shops')
+    s.editShop(id)
+    s.closeEditor()
+    expect(s.view).toBe('shops')
+    expect(s.editingShopId).toBeNull()
+  })
+
+  it('applies the same rule after deleting the shop', async () => {
+    const s = await fresh()
+    const r = await s.createShop('Rewe')
+    if (!r.ok) throw new Error('create failed')
+    s.editShop(r.shop.id, 'list')
+    await s.deleteShop(r.shop.id)
+    s.closeEditor()
+    expect(s.view).toBe('list')
+  })
+})

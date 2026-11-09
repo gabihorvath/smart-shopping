@@ -18,7 +18,7 @@ async function choose(id: string) {
 
 function edit(id: string) {
   emit('update:modelValue', false)
-  store.editShop(id)
+  store.editShop(id, 'list')
 }
 </script>
 

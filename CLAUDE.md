@@ -4,9 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-Scaffolded (Task 2 done): placeholder home page only, no app features yet. Local git repo on `main`; GitHub repo name is `smart-shopping` (Vite `base` and manifest scope are `/smart-shopping/`, set in `vite.config.ts`). npm; Pinia, `idb`, ESLint + Prettier, Vitest (jsdom) are installed.
+App implemented (phases A-E): list, shops, catalog, PWA/offline, polish. Local git repo; GitHub repo name is `smart-shopping` (Vite `base` and manifest scope are `/smart-shopping/`, set in `vite.config.ts`). npm; Pinia, `idb`, `vue-draggable-plus`, ESLint + Prettier, Vitest (jsdom, `fake-indexeddb`) and Playwright are installed.
 
-Commands: `npm run dev`, `npm run build` (vue-tsc + vite build), `npm run lint`, `npm run format`, `npm test` (vitest run; single file: `npx vitest run src/App.test.ts`). Deploy workflow: `.github/workflows/deploy.yml` (lint, test, build, Pages).
+Commands: `npm run dev`, `npm run build` (vue-tsc + vite build), `npm run lint`, `npm run format`, `npm test` (vitest run; single file: `npx vitest run src/App.test.ts`), `npm run test:e2e` (Playwright against a built preview; local only, not in CI; includes an offline/service-worker project). Deploy workflow: `.github/workflows/deploy.yml` (lint, test, build, Pages).
+
+Layout: `src/domain` (types, pure view/amount/text logic, seed), `src/db` (idb access), `src/stores` (Pinia app store), `src/components` (screens and sheets), `src/components/ui` (shared widgets), `src/composables` (dialogs, snackbars, tab state), `e2e` (Playwright specs).
 
 - `docs/concept.md` is the **source of truth for behaviour**.
 - `docs/design.md` extends it with the data model, derived view logic, rules and wireframes.

@@ -30,6 +30,7 @@ export type AddResult =
   | { status: 'invalid'; error: string }
 
 export type View = 'list' | 'shops' | 'catalog'
+export type EditorOrigin = 'list' | 'shops'
 
 const fail = (error: string): Failure => ({ ok: false, error })
 
@@ -45,6 +46,7 @@ export const useAppStore = defineStore('app', () => {
   const view = ref<View>('list')
   /** Shop shown in the shop editor (view === 'shops'); null = none open. */
   const editingShopId = ref<Id | null>(null)
+  const editorOrigin = ref<EditorOrigin>('shops')
   const ready = ref(false)
   /** Set when a write-through to IndexedDB failed (memory and DB may differ). */
   const writeError = ref<string | null>(null)
@@ -126,9 +128,16 @@ export const useAppStore = defineStore('app', () => {
     view.value = v
     if (v !== 'shops') editingShopId.value = null
   }
-  function editShop(id: Id | null) {
+  /** Opens the shop editor; `from` is where Back returns to ('list' = main list, 'shops' = shop list). */
+  function editShop(id: Id, from: EditorOrigin = 'shops') {
     editingShopId.value = id
-    if (id) view.value = 'shops'
+    editorOrigin.value = from
+    view.value = 'shops'
+  }
+  /** Back from the editor (also after deleting the shop): to where it was opened from. */
+  function closeEditor() {
+    editingShopId.value = null
+    if (editorOrigin.value === 'list') view.value = 'list'
   }
 
   // ---- name helpers ----
@@ -410,7 +419,6 @@ export const useAppStore = defineStore('app', () => {
     if (!shopById.value.has(id)) return fail(MSG.notFound)
     if (shops.value.length <= 1) return fail(MSG.lastShop)
     shops.value = shops.value.filter((s) => s.id !== id)
-    if (editingShopId.value === id) editingShopId.value = null
     const batch: WriteBatch = { shops: { delete: [id] } }
     if (activeShopId.value === id || settings.value.lastShopId === id) {
       const first = shops.value[0]!
@@ -450,6 +458,7 @@ export const useAppStore = defineStore('app', () => {
     activeShopId,
     view,
     editingShopId,
+    editorOrigin,
     ready,
     writeError,
     // getters
@@ -466,6 +475,7 @@ export const useAppStore = defineStore('app', () => {
     init,
     setView,
     editShop,
+    closeEditor,
     addItem,
     confirmAddAmount,
     setAmount,

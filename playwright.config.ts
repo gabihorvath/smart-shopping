@@ -11,7 +11,15 @@ export default defineConfig({
     serviceWorkers: 'block',
     ...devices['Pixel 7'],
   },
-  projects: [{ name: 'chromium' }],
+  projects: [
+    { name: 'chromium', testIgnore: /offline\.spec\.ts/ },
+    // service workers allowed: verifies the precache / offline start
+    {
+      name: 'offline',
+      testMatch: /offline\.spec\.ts/,
+      use: { serviceWorkers: 'allow' },
+    },
+  ],
   webServer: {
     command: `npm run build && npm run preview -- --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}/smart-shopping/`,

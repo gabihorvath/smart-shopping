@@ -9,9 +9,8 @@ async function createShop(page: Page, name: string) {
   await expect(page.getByRole('heading', { name })).toBeVisible()
 }
 
-/** From the editor back to the main list (editor -> shop list -> list). */
+/** Editor opened from the selector sheet: one Back returns straight to the main list. */
 async function backToList(page: Page) {
-  await page.getByRole('button', { name: 'Zurück' }).click()
   await page.getByRole('button', { name: 'Zurück' }).click()
   await expect(page.getByTestId('shop-selector')).toBeVisible()
 }
@@ -191,13 +190,35 @@ test('delete asks for confirmation; the active shop falls back to the remaining 
   await expect(page.getByRole('heading', { name: 'Rewe' })).toBeVisible()
   await page.getByRole('button', { name: 'Löschen' }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Löschen' }).click()
-  // back on the shop list, only Standard is left
-  await expect(page.getByRole('heading', { name: 'Läden' })).toBeVisible()
-  await expect(page.getByTestId('shop-row')).toHaveCount(1)
-  await page.getByRole('button', { name: 'Zurück' }).click()
+  // opened from the selector: lands on the main list, only Standard is left
   await expect(page.getByTestId('shop-selector')).toContainText('Standard')
+  await expect(page.getByRole('heading', { name: 'Läden' })).toHaveCount(0)
   await page.reload()
   await expect(page.getByTestId('shop-selector')).toContainText('Standard')
+})
+
+test('back from the editor returns to where it was opened from', async ({ page }) => {
+  await openApp(page)
+  await createShop(page, 'Rewe')
+  await page.getByRole('button', { name: 'Zurück' }).click()
+  await expect(page.getByTestId('shop-selector')).toBeVisible()
+  // via the selector's pencil: straight back to the list
+  await page.getByTestId('shop-selector').click()
+  await page.getByRole('button', { name: 'Rewe bearbeiten' }).click()
+  await page.getByRole('button', { name: 'Zurück' }).click()
+  await expect(page.getByTestId('shop-selector')).toBeVisible()
+  // via Menü -> Läden: back to the shop list, then to the list
+  await page.getByRole('button', { name: 'Menü' }).click()
+  await page.getByRole('menuitem', { name: 'Läden' }).click()
+  await page.getByTestId('shop-row').filter({ hasText: 'Rewe' }).click()
+  await page.getByRole('button', { name: 'Zurück' }).click()
+  await expect(page.getByRole('heading', { name: 'Läden' })).toBeVisible()
+  // deleting from the shop list's editor returns to the shop list
+  await page.getByTestId('shop-row').filter({ hasText: 'Rewe' }).click()
+  await page.getByRole('button', { name: 'Löschen' }).click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Löschen' }).click()
+  await expect(page.getByRole('heading', { name: 'Läden' })).toBeVisible()
+  await expect(page.getByTestId('shop-row')).toHaveCount(1)
 })
 
 test('the last shop cannot be deleted', async ({ page }) => {
