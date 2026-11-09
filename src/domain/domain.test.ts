@@ -8,7 +8,7 @@ import {
   toInputText,
   validateAmount,
 } from './amount'
-import { buildSeed } from './seed'
+import { buildSeed, seedAdditions } from './seed'
 import { compareNames, foldForSearch, namesEqual, normalizeName } from './text'
 import type { Aisle, CatalogItem, ListEntry, Shop, Unit } from './types'
 import { buildCatalogForAdd, buildCatalogGlobal, buildListView } from './view'
@@ -85,6 +85,27 @@ describe('text', () => {
 })
 
 describe('seed', () => {
+  it('seedAdditions adds only what is missing, matched by name', () => {
+    let n = 0
+    const full = buildSeed(() => `s${n++}`)
+    expect(seedAdditions(full, () => 'x')).toEqual({ units: [], aisles: [], items: [] })
+
+    // older install: renamed-case unit, one aisle and some items missing
+    const units = full.units.map((u) => (u.name === 'kg' ? { ...u, name: 'KG' } : u))
+    const dropAisle = full.aisles[10]!
+    const aisles = full.aisles.slice(0, 10)
+    const items = full.items.filter((i) => i.aisleId !== dropAisle.id).slice(3)
+    let m = 0
+    const add = seedAdditions({ units, aisles, items }, () => `n${m++}`)
+    expect(add.units).toEqual([])
+    expect(add.aisles).toEqual([{ id: expect.any(String), name: dropAisle.name, sortKey: 11 }])
+    expect(add.items).toHaveLength(full.items.length - items.length)
+    const apfel = add.items.find((i) => i.name === 'Äpfel')!
+    expect(apfel.unitId).toBe(full.units.find((u) => u.name === 'kg')!.id) // existing unit reused
+    expect(apfel.aisleId).toBe(full.aisles[0]!.id)
+    expect(add.items.filter((i) => i.aisleId === add.aisles[0]!.id).length).toBeGreaterThan(0)
+  })
+
   it('matches the concept table', () => {
     let n = 0
     const s = buildSeed(() => `id${n++}`)

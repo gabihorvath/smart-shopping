@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref, toRaw } from 'vue'
 import { loadAll, openDatabase, writeBatch, type Db, type WriteBatch } from '../db/db'
 import { roundAmount, validateAmount } from '../domain/amount'
-import { buildSeed } from '../domain/seed'
+import { buildSeed, SEED_VERSION, seedAdditions } from '../domain/seed'
 import { namesEqual, normalizeName } from '../domain/text'
 import type { Aisle, CatalogItem, Id, ListEntry, Settings, Shop, Unit } from '../domain/types'
 import { buildListView, type ListView } from '../domain/view'
@@ -95,7 +95,7 @@ export const useAppStore = defineStore('app', () => {
     let s: Settings = data.settings ?? { lastShopId: null, seeded: false, schemaVersion: 1 }
     if (!s.seeded) {
       const seed = buildSeed()
-      s = { ...s, seeded: true, lastShopId: seed.shop.id }
+      s = { ...s, seeded: true, seedVersion: SEED_VERSION, lastShopId: seed.shop.id }
       await writeBatch(db, {
         units: { put: seed.units },
         aisles: { put: seed.aisles },
@@ -107,6 +107,19 @@ export const useAppStore = defineStore('app', () => {
       data.aisles = seed.aisles
       data.items = seed.items
       data.shops = [seed.shop]
+    } else if ((s.seedVersion ?? 1) < SEED_VERSION) {
+      // Seed grew since this install was seeded: merge in what is missing, once.
+      const add = seedAdditions(data)
+      s = { ...s, seedVersion: SEED_VERSION }
+      await writeBatch(db, {
+        units: { put: add.units },
+        aisles: { put: add.aisles },
+        items: { put: add.items },
+        settings: s,
+      })
+      data.units = [...data.units, ...add.units]
+      data.aisles = [...data.aisles, ...add.aisles]
+      data.items = [...data.items, ...add.items]
     }
     units.value = data.units
     aisles.value = data.aisles

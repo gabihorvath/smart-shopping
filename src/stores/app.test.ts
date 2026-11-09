@@ -3,6 +3,7 @@ import { IDBFactory } from 'fake-indexeddb'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { loadAll, openDatabase } from '../db/db'
+import { SEED_VERSION } from '../domain/seed'
 import { MSG, useAppStore } from './app'
 
 async function fresh() {
@@ -49,6 +50,47 @@ describe('init and seed', () => {
     const again = await fresh()
     expect(again.items).toHaveLength(n - 1)
     expect(again.items.find((i) => i.name === 'Milch')).toBeUndefined()
+  })
+
+  it('merges a grown seed into an older install once, keeping user data', async () => {
+    const s = await fresh()
+    const n = s.items.length
+    expect(s.settings.seedVersion).toBe(SEED_VERSION)
+    // simulate an install seeded with the old, smaller seed
+    const milch = itemNamed(s, 'Milch')
+    const oldUnitId = milch.unitId
+    expect(
+      (
+        await s.updateItem(milch.id, {
+          name: 'Milch',
+          unitId: s.units[0]!.id,
+          aisleId: milch.aisleId,
+        })
+      ).ok,
+    ).toBe(true)
+    const db = await openDatabase()
+    const all = await loadAll(db)
+    const removed = all.items.filter((i) => i.name !== 'Milch').slice(0, 5)
+    for (const i of removed) await db.delete('items', i.id)
+    const { seedVersion: _drop, ...oldSettings } = s.settings
+    void _drop
+    await db.put('settings', oldSettings, 'settings')
+    db.close()
+
+    const again = await fresh()
+    expect(again.items).toHaveLength(n)
+    expect(again.settings.seedVersion).toBe(SEED_VERSION)
+    for (const i of removed) expect(again.items.some((x) => x.name === i.name)).toBe(true)
+    // existing item kept its user edit, no duplicate
+    expect(again.items.filter((i) => i.name === 'Milch')).toHaveLength(1)
+    expect(itemNamed(again, 'Milch').unitId).not.toBe(oldUnitId)
+    expect(again.units).toHaveLength(11)
+    expect(again.aisles).toHaveLength(11)
+
+    // applied once: deleting a seed item afterwards sticks
+    expect((await again.deleteItem(itemNamed(again, removed[0]!.name).id)).ok).toBe(true)
+    const third = await fresh()
+    expect(third.items).toHaveLength(n - 1)
   })
 
   it('falls back to the first shop when lastShopId is invalid', async () => {

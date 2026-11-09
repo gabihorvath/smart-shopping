@@ -65,6 +65,7 @@ interface Shop {
 interface Settings {
   lastShopId: Id | null
   seeded: boolean     // seed data was applied
+  seedVersion?: number // seed version merged in; missing = 1
   schemaVersion: number
 }
 ```
@@ -149,6 +150,7 @@ Changing the active shop recomputes the view only. Entries are never changed by 
 ### Seed and first start
 - On first start (`settings.seeded == false`) in one transaction: create the units, aisles (in the concept's order, `sortKey` 1..11), catalog items from the concept's seed table, and a default shop "Standard" containing all aisles in that order. Set `lastShopId` to it, `seeded = true`.
 - Seed is applied once. Items the user deletes do not come back.
+- Seed growth: `seed.ts` exports `SEED_VERSION` (bump it when seed entries are added); new installs store it as `settings.seedVersion`. On start, if the stored version is lower (missing = 1), the seed units, aisles and items whose names (case-insensitive) do not exist yet are added in one transaction and `seedVersion` is updated. Existing records are not changed; new aisles follow the new-aisle rule (next `sortKey`, in no shop). Each version is merged once, so deletions after that stick; items deleted before the merge come back once.
 
 ### Active shop
 - On start use `lastShopId`; if missing or invalid, use the first shop. Switching the shop writes `lastShopId`.
