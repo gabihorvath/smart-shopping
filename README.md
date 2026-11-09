@@ -2,6 +2,8 @@
 
 Private single-user shopping list PWA (Vue 3 + TypeScript + Vite + Tailwind + Pinia). See `docs/`.
 
+**Using the app:** [User guide](docs/user-guide.md)
+
 ## Commands
 
 - `npm install` – install dependencies
