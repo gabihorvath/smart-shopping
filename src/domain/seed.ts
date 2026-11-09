@@ -1,3 +1,4 @@
+import { normalizeName } from './text'
 import type { Aisle, CatalogItem, Id, Shop, Unit } from './types'
 
 const UNIT_STEPS: [string, number][] = [
@@ -967,6 +968,12 @@ const SEED_AISLES: [string, [string, string][]][] = [
   ],
 ]
 
+/**
+ * Bump whenever SEED_AISLES / UNIT_STEPS gain entries, so existing installs merge them in.
+ * 1 = original core set, 2 = extended catalog (~800 items).
+ */
+export const SEED_VERSION = 2
+
 export interface SeedData {
   units: Unit[]
   aisles: Aisle[]
@@ -990,4 +997,50 @@ export function buildSeed(newId: () => Id = () => crypto.randomUUID()): SeedData
   })
   const shop: Shop = { id: newId(), name: 'Standard', aisleIds: aisles.map((a) => a.id) }
   return { units, aisles, items, shop }
+}
+
+export interface SeedAdditions {
+  units: Unit[]
+  aisles: Aisle[]
+  items: CatalogItem[]
+}
+
+/**
+ * Seed records missing from existing data, matched by name (case-insensitive).
+ * Existing records are never changed. New items reference existing units/aisles
+ * by name; new aisles get sortKey max + 1 and are not added to any shop.
+ */
+export function seedAdditions(
+  existing: { units: Unit[]; aisles: Aisle[]; items: CatalogItem[] },
+  newId: () => Id = () => crypto.randomUUID(),
+): SeedAdditions {
+  const key = (s: string) => normalizeName(s).toLowerCase()
+  const unitByName = new Map(existing.units.map((u) => [key(u.name), u]))
+  const aisleByName = new Map(existing.aisles.map((a) => [key(a.name), a]))
+  const itemNames = new Set(existing.items.map((i) => key(i.name)))
+  const out: SeedAdditions = { units: [], aisles: [], items: [] }
+
+  for (const [name, step] of UNIT_STEPS) {
+    if (unitByName.has(key(name))) continue
+    const unit: Unit = { id: newId(), name, step }
+    unitByName.set(key(name), unit)
+    out.units.push(unit)
+  }
+  let maxSort = Math.max(0, ...existing.aisles.map((a) => a.sortKey))
+  for (const [aisleName, list] of SEED_AISLES) {
+    let aisle = aisleByName.get(key(aisleName))
+    for (const [itemName, unitName] of list) {
+      if (itemNames.has(key(itemName))) continue
+      if (!aisle) {
+        aisle = { id: newId(), name: aisleName, sortKey: ++maxSort }
+        aisleByName.set(key(aisleName), aisle)
+        out.aisles.push(aisle)
+      }
+      const unit = unitByName.get(key(unitName))
+      if (!unit) throw new Error(`Unknown seed unit ${unitName}`)
+      itemNames.add(key(itemName))
+      out.items.push({ id: newId(), name: itemName, unitId: unit.id, aisleId: aisle.id })
+    }
+  }
+  return out
 }

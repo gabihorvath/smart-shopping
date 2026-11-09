@@ -41,5 +41,7 @@ export interface Shop {
 export interface Settings {
   lastShopId: Id | null
   seeded: boolean
+  /** Seed version merged into the data; missing = 1 (installs from before versioning). */
+  seedVersion?: number
   schemaVersion: number
 }

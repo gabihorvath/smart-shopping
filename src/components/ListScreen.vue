@@ -8,6 +8,7 @@ import AddItemSheet from './AddItemSheet.vue'
 import AisleGroups from './AisleGroups.vue'
 import EditAmountSheet from './EditAmountSheet.vue'
 import ShopSelectorSheet from './ShopSelectorSheet.vue'
+import PlusIcon from './ui/PlusIcon.vue'
 
 const store = useAppStore()
 const dialog = useDialog()
@@ -208,7 +209,7 @@ function go(v: 'shops' | 'catalog') {
       class="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex size-14 items-center justify-center rounded-full bg-coral-500 text-3xl text-white shadow-fab transition active:scale-95 active:bg-coral-600"
       @click="addOpen = true"
     >
-      +
+      <PlusIcon />
     </button>
 
     <AddItemSheet v-model="addOpen" />
