@@ -23,6 +23,34 @@ function setLock(on: boolean) {
 }
 onBeforeUnmount(() => setLock(false))
 
+// The on-screen keyboard shrinks only the visual viewport (not dvh), so size the sheet
+// container to it; otherwise the keyboard covers the lower part of the scrollable list.
+const vv = typeof window !== 'undefined' ? window.visualViewport : null
+const frame = ref<{ top: string; height: string } | null>(null)
+function syncViewport() {
+  frame.value = vv ? { top: `${vv.offsetTop}px`, height: `${vv.height}px` } : null
+}
+watch(
+  () => props.modelValue,
+  (open) => {
+    if (!vv) return
+    if (open) {
+      syncViewport()
+      vv.addEventListener('resize', syncViewport)
+      vv.addEventListener('scroll', syncViewport)
+    } else {
+      vv.removeEventListener('resize', syncViewport)
+      vv.removeEventListener('scroll', syncViewport)
+      frame.value = null
+    }
+  },
+  { immediate: true },
+)
+onBeforeUnmount(() => {
+  vv?.removeEventListener('resize', syncViewport)
+  vv?.removeEventListener('scroll', syncViewport)
+})
+
 watch(
   () => props.modelValue,
   async (open) => {
@@ -46,7 +74,11 @@ function close() {
 </script>
 
 <template>
-  <div v-if="modelValue" class="fixed inset-0 z-40 flex flex-col justify-end">
+  <div
+    v-if="modelValue"
+    class="fixed inset-x-0 top-0 bottom-0 z-40 flex flex-col justify-end"
+    :style="frame ? { top: frame.top, height: frame.height, bottom: 'auto' } : undefined"
+  >
     <div class="absolute inset-0 bg-ink/35" data-testid="sheet-backdrop" @click="close" />
     <div
       ref="panel"
@@ -55,7 +87,7 @@ function close() {
       :aria-label="title"
       tabindex="-1"
       class="sheet-panel relative flex w-full flex-col rounded-t-3xl bg-card shadow-sheet outline-none"
-      :class="full ? 'h-[92dvh]' : 'max-h-[85dvh]'"
+      :class="full ? 'h-[92%]' : 'max-h-[85%]'"
       @keydown.esc.stop="close"
     >
       <div aria-hidden="true" class="mx-auto mt-2.5 h-1.5 w-10 shrink-0 rounded-full bg-line" />
