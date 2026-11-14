@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
-import { currentDialog, settleDialog } from '../../composables/useDialog'
+import { currentDialog, settleChoice, settleDialog } from '../../composables/useDialog'
 
 const okBtn = ref<HTMLButtonElement>()
+const firstChoice = ref<HTMLButtonElement[]>()
 
 watch(currentDialog, async (d) => {
   if (d) {
     await nextTick()
     okBtn.value?.focus()
+    firstChoice.value?.[0]?.focus()
   }
 })
 
@@ -29,7 +31,24 @@ function cancel() {
       class="w-full max-w-sm rounded-3xl bg-card p-6 shadow-sheet"
     >
       <p class="text-base text-ink">{{ currentDialog.text }}</p>
-      <div class="mt-5 flex justify-end gap-2">
+      <div v-if="currentDialog.kind === 'choice'" class="mt-5 flex flex-col gap-2">
+        <button
+          v-for="(c, i) in currentDialog.choices"
+          :key="c.value"
+          ref="firstChoice"
+          type="button"
+          class="min-h-11 rounded-xl px-4 font-semibold"
+          :class="
+            i === 0
+              ? 'bg-coral-500 text-white active:bg-coral-600'
+              : 'bg-cream-deep text-ink active:bg-line'
+          "
+          @click="settleChoice(c.value)"
+        >
+          {{ c.label }}
+        </button>
+      </div>
+      <div v-else class="mt-5 flex justify-end gap-2">
         <button
           v-if="currentDialog.kind === 'confirm'"
           type="button"

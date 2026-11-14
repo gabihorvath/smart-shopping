@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useDialog } from '../composables/useDialog'
+import { useShare } from '../composables/useShare'
 import { useSnackbars } from '../composables/useSnackbars'
 import type { ListRow } from '../domain/view'
 import { useAppStore } from '../stores/app'
@@ -13,6 +14,7 @@ import PlusIcon from './ui/PlusIcon.vue'
 const store = useAppStore()
 const dialog = useDialog()
 const snackbars = useSnackbars()
+const { shareList } = useShare()
 
 const addOpen = ref(false)
 const shopSheetOpen = ref(false)
@@ -76,6 +78,11 @@ async function clearDone() {
   if (ok) await store.clearChecked()
 }
 
+function share() {
+  menuOpen.value = false
+  void shareList()
+}
+
 function go(v: 'shops' | 'catalog') {
   menuOpen.value = false
   store.setView(v)
@@ -129,6 +136,15 @@ function go(v: 'shops' | 'catalog') {
               @click="go('catalog')"
             >
               Katalog
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              data-testid="share-list"
+              class="flex min-h-12 w-full items-center px-4 text-left font-medium active:bg-cream-deep"
+              @click="share"
+            >
+              Liste teilen
             </button>
           </div>
         </template>

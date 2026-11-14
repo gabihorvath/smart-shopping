@@ -1,14 +1,24 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onBeforeUnmount, onMounted } from 'vue'
 import CatalogView from './components/CatalogView.vue'
+import ImportSheet from './components/ImportSheet.vue'
 import ListScreen from './components/ListScreen.vue'
 import ShopsView from './components/ShopsView.vue'
 import DialogHost from './components/ui/DialogHost.vue'
 import SnackbarHost from './components/ui/SnackbarHost.vue'
+import { captureImportHash } from './composables/useShare'
 import { useAppStore } from './stores/app'
 
 const store = useAppStore()
-onMounted(() => store.init())
+const onHashChange = () => {
+  if (store.ready) captureImportHash()
+}
+onMounted(async () => {
+  await store.init()
+  captureImportHash() // link opened at start: after load and seed
+  window.addEventListener('hashchange', onHashChange) // link opened while the app is running
+})
+onBeforeUnmount(() => window.removeEventListener('hashchange', onHashChange))
 </script>
 
 <template>
@@ -32,6 +42,7 @@ onMounted(() => store.init())
     <ShopsView v-if="store.view === 'shops'" />
     <CatalogView v-else-if="store.view === 'catalog'" />
     <ListScreen v-else />
+    <ImportSheet />
   </template>
   <DialogHost />
   <SnackbarHost />
