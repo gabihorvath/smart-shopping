@@ -51,11 +51,21 @@ If the list is empty, a friendly empty state is shown ("Deine Liste ist leer"). 
 - Add and edit items, units and aisles.
 - Deleting a unit, aisle or item that is still in use is blocked with a message.
 
+### Sharing the list
+- The menu has "Liste teilen". It builds a link containing the **open** items (name, amount, unit name, aisle name) and hands it to the system share sheet; if that is unavailable, the link is copied to the clipboard.
+- Without a backend, the data travels inside the link (in the URL fragment, so it never reaches a server).
+- Opening such a link in the app never changes anything by itself. The app shows a preview sheet; the user confirms the import.
+- Open items that are already on the receiver's list: one choice for the whole import, add the amounts (default) or keep the receiver's amounts. Checked items are reopened with the incoming amount.
+- Items are matched to the receiver's catalog by name (case-insensitive, exact, no fuzzy matching).
+- Items unknown to the receiver, and items whose unit differs from the receiver's catalog unit, are never handled silently: the app asks once per item (details in design.md).
+- Invalid or damaged links show "Link ungültig." and change nothing.
+- Platform: targeted at Android (Chrome / installed PWA). iOS opens links in Safari, whose storage is separate from the home-screen app; not supported.
+
 ## Out of scope
-Multi-user, sync, multiple lists, i18n, dark mode, export/share, and any extras beyond the above.
+Multi-user, sync, multiple lists, i18n, dark mode, backup/export of data, and any extras beyond the above. Sharing the open items as a link (above) is the only sharing feature.
 
 ## Decisions
-- No backup or export. Data lives only in the phone's browser storage.
+- No backup or export. Data lives only in the phone's browser storage. The share link is a one-off hand-over of the open items, not a backup.
 - No separate "clear whole list" button. The Done section's clear button is enough.
 - Hosting: GitHub Pages (static, HTTPS), built and deployed with GitHub Actions. Vite `base` and the PWA manifest use the repo sub-path.
 

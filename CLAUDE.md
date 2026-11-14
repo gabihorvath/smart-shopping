@@ -17,7 +17,7 @@ Layout: `src/domain` (types, pure view/amount/text logic, seed), `src/db` (idb a
 
 ## What it is
 
-A private, single-user, single-list shopping app, used mainly on a phone in the store. **UI strings are German; docs and code are English.** Out of scope: multi-user, sync, multiple lists, i18n, dark mode, export/backup/share, and any extras.
+A private, single-user, single-list shopping app, used mainly on a phone in the store. **UI strings are German; docs and code are English.** Out of scope: multi-user, sync, multiple lists, i18n, dark mode, export/backup, and any extras. The one sharing feature is "Liste teilen": a link carrying the open items (URL fragment), imported by the receiver after a preview (see concept.md, design.md section 3).
 
 Stack (fixed): Vue 3 + TypeScript + Vite + Tailwind, PWA (installable, offline), no backend. Hosted on GitHub Pages (public repo) via GitHub Actions on push to main, so Vite `base` and the PWA manifest must use the repo sub-path. Drag-and-drop via SortableJS / `vue-draggable-plus` (handle-only drag so touch scrolling still works).
 
