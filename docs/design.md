@@ -167,6 +167,7 @@ Changing the active shop recomputes the view only. Entries are never changed by 
   - Catalog item found, **different unit**: ask for this item: **"„X“ ist bei dir in kg, der Link sagt 500 g. Menge trotzdem als 500 kg übernehmen?"** [Übernehmen] [Überspringen] [Abbrechen]. Übernehmen then applies as above with the number unchanged.
   - **Not in the catalog**: ask for this item: **"„X“ ist nicht in deinem Katalog. Anlegen? (Einheit: g, Gang: Obst & Gemüse)"** [Anlegen] [Überspringen] [Abbrechen]. Anlegen creates the catalog item (unit and aisle matched by name; no new unit or aisle is ever created) and an entry. If the unit name has no match, use the first unit; if the aisle name has no match, use the aisle with the lowest `sortKey`. The prompt shows what will be used. The user can fix it later in the catalog.
   - Abbrechen in any prompt stops the import. Items processed so far stay (each item is its own write-through, like any other add).
+  - An incoming amount below the receiver unit's `step` is raised to the step (the add rule's minimum).
   - Prompts are shown one after another, only for items that need them. Items that need no prompt are applied first.
 - **Result**: snackbar "N Artikel importiert" (+ ", M übersprungen" if any). The new catalog items follow the normal Names rule (unique, case-insensitive), which the name match already guarantees.
 

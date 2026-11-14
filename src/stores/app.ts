@@ -3,6 +3,7 @@ import { computed, ref, toRaw } from 'vue'
 import { loadAll, openDatabase, writeBatch, type Db, type WriteBatch } from '../db/db'
 import { roundAmount, validateAmount } from '../domain/amount'
 import { buildSeed, SEED_VERSION, seedAdditions } from '../domain/seed'
+import type { SharedItem } from '../domain/share'
 import { namesEqual, normalizeName } from '../domain/text'
 import type { Aisle, CatalogItem, Id, ListEntry, Settings, Shop, Unit } from '../domain/types'
 import { buildListView, type ListView } from '../domain/view'
@@ -233,6 +234,43 @@ export const useAppStore = defineStore('app', () => {
     replaceEntry(e)
     await persist({ entries: { put: [e] } })
     return { ok: true }
+  }
+
+  /** Open entries as share payload items (names, not ids). */
+  function shareItems(): SharedItem[] {
+    const out: SharedItem[] = []
+    for (const e of entries.value) {
+      if (e.checked) continue
+      const item = itemById.value.get(e.itemId)
+      const unit = item && unitById.value.get(item.unitId)
+      const aisle = item && aisleById.value.get(item.aisleId)
+      if (item && unit && aisle)
+        out.push({ name: item.name, amount: e.amount, unit: unit.name, aisle: aisle.name })
+    }
+    return out
+  }
+
+  /**
+   * Applies one imported amount. Open entry: add ('add') or leave alone ('keep'); checked entry:
+   * reopened with the incoming amount; no entry: created. Amounts below the unit's step are
+   * raised to the step.
+   */
+  async function importEntry(
+    itemId: Id,
+    amount: number,
+    mode: 'add' | 'keep',
+  ): Promise<'applied' | 'kept' | 'invalid'> {
+    const item = itemById.value.get(itemId)
+    const unit = item && unitById.value.get(item.unitId)
+    if (!item || !unit) return 'invalid'
+    const a = Math.max(roundAmount(amount), unit.step)
+    const existing = entryByItemId.value.get(itemId)
+    if (existing && !existing.checked) {
+      if (mode === 'keep') return 'kept'
+      return (await confirmAddAmount(itemId, a)).ok ? 'applied' : 'invalid'
+    }
+    const r = await addItem(itemId, a)
+    return r.status === 'added' || r.status === 'reopened' ? 'applied' : 'invalid'
   }
 
   /** Removes the entry and returns it (for undo via restoreEntry), or null if unknown. */
@@ -492,6 +530,8 @@ export const useAppStore = defineStore('app', () => {
     closeEditor,
     addItem,
     confirmAddAmount,
+    shareItems,
+    importEntry,
     setAmount,
     toggleChecked,
     removeEntry,

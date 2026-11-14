@@ -48,6 +48,14 @@ Open the header **Menü** and choose **Läden** to manage shops:
 
 **Menü → Katalog** has three tabs: items, units and aisles. Add, rename or edit entries. Names must be unique ("Name existiert schon."). Items on the list, and units or aisles still used by catalog items, can't be deleted. A message tells you how many are using them. Deleting an aisle only removes it from the shops' lists.
 
+## Sharing the list
+
+**Menü → Liste teilen** creates a link with all open items (checked items are left out) and opens the share sheet; if that isn't available, the link is copied. Whoever opens the link (Android) sees a preview and taps **Importieren**; nothing changes before that.
+
+- If some items are already open on their list, they choose between **Mengen addieren** and **Meine Mengen behalten**. Checked items are reopened with the incoming amount.
+- Items are matched by name. For an item that isn't in their catalog, or whose unit differs from the catalog's, the app asks once per item: **Anlegen / Übernehmen**, **Überspringen** or **Abbrechen**.
+- A damaged link shows "Link ungültig." and changes nothing.
+
 ## Tips
 
 - Set up each shop's aisle order once, and the list then follows your route through the store.
