@@ -155,6 +155,21 @@ Changing the active shop recomputes the view only. Entries are never changed by 
 ### Active shop
 - On start use `lastShopId`; if missing or invalid, use the first shop. Switching the shop writes `lastShopId`.
 
+### Share and import
+- **Payload** (v1): `{ v: 1, items: [{ n: name, a: amount, u: unit name, g: aisle name }] }` for all open entries. Names, not ids (ids are per device). JSON -> UTF-8 -> base64url.
+- **Link**: `<origin><base>#import=<payload>`. A fragment, so it is never sent to a server and needs no routing. Nothing is stored for it.
+- **Sender**: menu "Liste teilen". No open entries: message "Keine offenen Artikel zum Teilen." and no link. Otherwise `navigator.share({ title, text, url })`; if unsupported (or it throws something other than the user cancelling), copy to the clipboard and show the snackbar "Link kopiert".
+- **Receiver, on start (after load and seed) and on `hashchange`**: if the hash starts with `#import=`, decode and validate, then **immediately clear the hash** (`history.replaceState`) so a reload cannot import again. Invalid: dialog "Link ungültig.", nothing changes. Valid: open the import sheet.
+- **Validation** (the link is untrusted input): `v === 1`; `items` is an array of at most 200 entries; `n`, `u`, `g` are strings, trimmed, non-empty, at most 80 chars; `a` is a finite number > 0, rounded to 3 decimals. Any violation rejects the whole link. Duplicate names (case-insensitive) in the payload are merged by adding amounts. Text is only ever rendered through Vue interpolation.
+- **Import sheet**: "N Artikel importieren", a preview list (name, amount, unit), and, only when at least one item is already open on the receiver's list, a choice **Mengen addieren** (default) / **Meine Mengen behalten**. Buttons "Importieren" / "Abbrechen". Cancel changes nothing.
+- **Processing** (after "Importieren"), each item matched to a catalog item by name, case-insensitive exact:
+  - Catalog item found, same unit (name, case-insensitive): apply by list state. No entry: create. Open entry: add amounts or keep, per the sheet choice. Checked entry: reopen, `amount` replaced (as in Add).
+  - Catalog item found, **different unit**: ask for this item: **"„X“ ist bei dir in kg, der Link sagt 500 g. Menge trotzdem als 500 kg übernehmen?"** [Übernehmen] [Überspringen] [Abbrechen]. Übernehmen then applies as above with the number unchanged.
+  - **Not in the catalog**: ask for this item: **"„X“ ist nicht in deinem Katalog. Anlegen? (Einheit: g, Gang: Obst & Gemüse)"** [Anlegen] [Überspringen] [Abbrechen]. Anlegen creates the catalog item (unit and aisle matched by name; no new unit or aisle is ever created) and an entry. If the unit name has no match, use the first unit; if the aisle name has no match, use the aisle with the lowest `sortKey`. The prompt shows what will be used. The user can fix it later in the catalog.
+  - Abbrechen in any prompt stops the import. Items processed so far stay (each item is its own write-through, like any other add).
+  - Prompts are shown one after another, only for items that need them. Items that need no prompt are applied first.
+- **Result**: snackbar "N Artikel importiert" (+ ", M übersprungen" if any). The new catalog items follow the normal Names rule (unique, case-insensitive), which the name match already guarantees.
+
 ---
 
 ## 4. Screens (mobile first)
@@ -191,7 +206,7 @@ Interactions:
 - "Entfernen" in the Erledigt header: confirm dialog "N erledigte Artikel entfernen?", then deletes all checked entries.
 - Tap the amount: opens the amount sheet to correct it (same sheet as in 4.2, without the search).
 - FAB "+": opens the add flow.
-- Menu (≡): "Läden", "Katalog".
+- Menu (≡): "Läden", "Katalog", "Liste teilen" (see section 3, Share and import).
 
 ### 4.2 Add-item flow
 
